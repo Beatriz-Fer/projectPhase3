@@ -248,12 +248,12 @@
               </div>
             </div>
 
-            <div class="who-to-follow__block" [routerLink]="['/follower-profile', { id: '0', name: 'David', email: 'david@gmail.com', photo: '/assets/images/profile-image-1.jpg' }]">
+            <div class="who-to-follow__block">
               <img
                 class="who-to-follow__author-logo"
                 src="/assets/images/profile-image-1.jpg"/>
               <div class="who-to-follow__content">
-                <div>
+                <div [routerLink]="['/follower-profile', { id: '0', name: 'David', email: 'david@gmail.com', photo: '/assets/images/profile-image-1.jpg' }]">
                   <div class="who-to-follow__author-name">
                     David
                   </div>
@@ -265,14 +265,15 @@
                   {{ followButtons[0].followed ? 'Unfollow' : 'Follow' }}
                 </button>
               </div>
+
             </div>
 
-            <div class="who-to-follow__block" [routerLink]="['/follower-profile', { id: '1', name: 'Susan', email: 'susan@gmail.com', photo: '/assets/images/profile-image-2.png' }]">
+            <div class="who-to-follow__block">
               <img
                 class="who-to-follow__author-logo"
                 src="/assets/images/profile-image-2.png"/>
               <div class="who-to-follow__content">
-                <div>
+                <div [routerLink]="['/follower-profile', { id: '1', name: 'Susan', email: 'susan@gmail.com', photo: '/assets/images/profile-image-2.png' }]">
                   <div class="who-to-follow__author-name">
                     Susan
                   </div>
@@ -286,12 +287,12 @@
               </div>
             </div>
 
-            <div class="who-to-follow__block" [routerLink]="['/follower-profile', { id: '2', name: 'John', email: 'john@gmail.com', photo: '/assets/images/profile-image-3.jpg' }]">
+            <div class="who-to-follow__block">
               <img
                 class="who-to-follow__author-logo"
                 src="/assets/images/profile-image-3.jpg"/>
               <div class="who-to-follow__content">
-                <div>
+                <div [routerLink]="['/follower-profile', { id: '2', name: 'John', email: 'john@gmail.com', photo: '/assets/images/profile-image-3.jpg' }]">
                   <div class="who-to-follow__author-name">
                     John
                   </div>
@@ -305,12 +306,12 @@
               </div>
             </div>
 
-            <div class="who-to-follow__block" [routerLink]="['/follower-profile', { id: '3', name: 'Teresa', email: 'teresa@gmail.com', photo: '/assets/images/profile-image-2.png' }]">
+            <div class="who-to-follow__block">
               <img
                 class="who-to-follow__author-logo"
                 src="/assets/images/profile-image-2.png"/>
               <div class="who-to-follow__content">
-                <div>
+                <div [routerLink]="['/follower-profile', { id: '3', name: 'Teresa', email: 'teresa@gmail.com', photo: '/assets/images/profile-image-2.png' }]">
                   <div class="who-to-follow__author-name">
                     Teresa
                   </div>
