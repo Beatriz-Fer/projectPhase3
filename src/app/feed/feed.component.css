@@ -51,6 +51,16 @@ html {
     font-weight: 700;
     padding: 20px;
   }
+
+  .sidebar-menu__item2 {
+    font-size: 19px;
+    color: #A0A0A0;
+    display: flex;
+    align-items: center;
+    font-weight: 700;
+    padding: 20px;
+    pointer-events: none;
+  }
   
   .sidebar-menu__item:hover {
     background: rgba(29, 161, 242, 0.1);
@@ -67,11 +77,18 @@ html {
     height: 26px;
     margin-right: 20px;
   }
+
+  .sidebar-menu__item-icon2 {
+    height: 26px;
+    margin-right: 20px;
+    opacity: 0.5;
+    filter: grayscale(100%); 
+    pointer-events: none; 
+  }
   
   .sidebar-menu__item--active .sidebar-menu__item-icon {
     filter: invert(67%) sepia(60%) saturate(4956%) hue-rotate(176deg) brightness(95%) contrast(99%);
   }
-
 
   /* ////////////////////////////////////////////////////////////////////////////////////////////// */
 
@@ -102,7 +119,7 @@ html {
     margin-right: 10px;
   }
   .widgets__searchIcon {
-    color: gray;
+    color:#1DA1F2
   }
 
   /* ////////////////////////////////////////////////////////////////////////////////////////////// */

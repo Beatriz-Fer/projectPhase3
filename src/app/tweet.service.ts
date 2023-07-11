@@ -31,7 +31,7 @@ export class TweetService {
       ...this.getDummyFollowerData(),
     ];
   return this.allTweets;
-  }
+}
 
 
   addTweet(tweet: Tweet)  {
@@ -62,7 +62,6 @@ export class TweetService {
   getLikes() {
     return this.likes;
   }
-
 
 
   getDummyUserData(){

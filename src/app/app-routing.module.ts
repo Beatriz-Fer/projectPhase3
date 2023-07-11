@@ -4,12 +4,14 @@ import { LoginComponent } from './login/login.component';
 import { RegisterComponent } from './register/register.component';
 import { FeedComponent } from './feed/feed.component';
 import { ProfileComponent } from './profile/profile.component';
+import { FollowerProfileComponent } from './follower-profile/follower-profile.component';
 
 const routes: Routes = [
   { path: 'register', component: RegisterComponent },
   { path: 'login', component: LoginComponent },
   { path: 'feed', component: FeedComponent},
-  { path: 'profile', component: ProfileComponent }
+  { path: 'profile', component: ProfileComponent },
+  { path: 'follower-profile/:id/:name/:email/:photo', component: FollowerProfileComponent }
 ];
 
 @NgModule({

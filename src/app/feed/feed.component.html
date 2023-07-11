@@ -1,10 +1,3 @@
-<!-- https://futurecodersweb.com/how-to-build-twitter-clone-using-html-and-css-tutorial/
-https://www.youtube.com/watch?v=aQNypoBaUNk -->
-
-<!-- Popup comment
-https://www.youtube.com/watch?v=FThtv9iorao -->
-
-
 <!DOCTYPE html>
 <html>
   <head>
@@ -22,16 +15,16 @@ https://www.youtube.com/watch?v=FThtv9iorao -->
             <img src="/assets/svg/home.svg" class="sidebar-menu__item-icon" />
             Home
           </div>
-          <div class="sidebar-menu__item">
-            <img src="/assets/svg/explore.svg" class="sidebar-menu__item-icon" />
+          <div class="sidebar-menu__item2">
+            <img src="/assets/svg/explore.svg" class="sidebar-menu__item-icon2" />
             Explore
           </div>
-          <div class="sidebar-menu__item">
-            <img src="/assets/svg/notifications.svg" class="sidebar-menu__item-icon"/>
+          <div class="sidebar-menu__item2">
+            <img src="/assets/svg/notifications.svg" class="sidebar-menu__item-icon2"/>
             Notifications
           </div>
-          <div class="sidebar-menu__item">
-            <img src="/assets/svg/messages.svg" class="sidebar-menu__item-icon" />
+          <div class="sidebar-menu__item2">
+            <img src="/assets/svg/messages.svg" class="sidebar-menu__item-icon2" />
             Messages
           </div>
           <div class="sidebar-menu__item">
@@ -39,10 +32,6 @@ https://www.youtube.com/watch?v=FThtv9iorao -->
               <img src="/assets/svg/profile.svg" class="sidebar-menu__item-icon" />
               Profile
             </a>
-          </div>
-          <div class="sidebar-menu__item">
-            <img src="/assets/svg/more.svg" class="sidebar-menu__item-icon" />
-            More
           </div>
         </div>
       </div>
@@ -158,7 +147,7 @@ https://www.youtube.com/watch?v=FThtv9iorao -->
           <div class="widgets">
             <div class="search_widget">
               <span class="material-icons widgets__searchIcon"> search </span>
-              <input type="text" placeholder="Search Twitter" />
+              <input type="text" [(ngModel)]="searchQuery" (keyup)="searchTweets()" placeholder="Search tweets" />
             </div>
           </div>
           </div>

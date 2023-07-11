@@ -44,13 +44,13 @@ export class ProfileComponent implements OnInit, OnDestroy{
   }
   
 
-  ngOnInit() {
+  ngOnInit() { 
+
   // Retrieve the logged-in email from the UserService
   this.loggedInEmail = localStorage.getItem('loggedInEmail') || '';
   this.loggedInName = localStorage.getItem('loggedInName') || '';
   this.loggedInBio = localStorage.getItem('loggedInBio') || '';
   this.loggedInPhoto = localStorage.getItem('loggedInPhoto') || '';
-
 
   // Following
   const storedFollowedState = localStorage.getItem('followedState');
@@ -101,8 +101,6 @@ saveChanges() {
   localStorage.setItem('loggedInName', this.loggedInName);
   localStorage.setItem('loggedInBio', this.loggedInBio);
   localStorage.setItem('loggedInPhoto', this.loggedInPhoto);
-
-  window.location.reload();
 
   // Close the popup box
   this.showPopup = false;

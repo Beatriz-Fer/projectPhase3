@@ -10,12 +10,14 @@ import { FeedComponent } from './feed/feed.component';
 import { RegisterComponent } from './register/register.component';
 import { ProfileComponent } from './profile/profile.component';
 import { TweetService } from './tweet.service';
+import { FollowerProfileComponent } from './follower-profile/follower-profile.component';
 
 const routes: Routes = [
   { path: 'register', component: RegisterComponent },
   { path: 'login', component: LoginComponent },
   { path: 'feed', component: FeedComponent },
   { path: 'profile', component: ProfileComponent },
+  { path: 'follower-profile', component: FollowerProfileComponent },
   { path: '', redirectTo: '/register',  pathMatch: 'full'},
   { path: '**', redirectTo: '/register' } // Handle invalid routes
 ];
@@ -26,7 +28,8 @@ const routes: Routes = [
     LoginComponent,
     RegisterComponent,
     FeedComponent,
-    ProfileComponent
+    ProfileComponent,
+    FollowerProfileComponent
   ],
   imports: [
     BrowserModule,

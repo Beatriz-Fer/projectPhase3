@@ -13,13 +13,15 @@ export class FeedComponent implements OnInit {
   tweets: Tweet[] = [];
 
   loggedInName!: string; 
-  loggedInEmail!: string; // '!' operator to indicate it will be initialized
+  loggedInEmail!: string; 
   loggedInBio: string = '';
   loggedInPhoto: string = '';
 
   newTweetContent: string = '';
 
   activeTweet: any = null;
+
+  searchQuery: string = '';
 
   constructor(private tweetService: TweetService) {
   }
@@ -33,14 +35,61 @@ export class FeedComponent implements OnInit {
     this.loggedInPhoto = localStorage.getItem('loggedInPhoto') || '';
 
     this.getTweets();
+
+     // Retrieve the comments from local storage
+    const savedComments = localStorage.getItem('comments');
+    if (savedComments) {
+      const parsedComments = JSON.parse(savedComments);
+      this.tweets.forEach((tweet, index) => {
+        tweet.comments = parsedComments[index] || []; // empty array if comments are undefined
+        tweet.commentCount = (tweet.comments?.length || 0) + 2; // updates comment count
+      });
+    }
+
   }
 
   
   private getTweets() {
+
+    const tweets = this.tweetService.getTweets();
+    const retweets = this.tweetService.getRetweets();
+    const likes = this.tweetService.getLikes();
+  
+    const likedTweetContents = likes.map(tweet => tweet.content);
+     
     // Combine the user and followed tweets
-    this.tweets = [...this.tweetService.getTweets(), ...this.tweetService.getRetweets(),...this.tweetService.getLikes()];
-    // sort the tweet order
+    this.tweets = [
+      ...tweets.filter(tweet => !likedTweetContents.includes(tweet.content)),
+      ...retweets,
+      ...likes
+    ];
+  
+    // Sort the tweet order
     this.tweets.sort((a, b) => b.timestamp.getTime() - a.timestamp.getTime());
+  }
+
+
+  searchTweets() {
+      // Perform the search based on the searchQuery
+      const filteredTweets = this.tweets.filter((tweet) => {
+        const lowerCaseQuery = this.searchQuery.toLowerCase();
+        const lowerCaseContent = tweet.content.toLowerCase();
+        const lowerCaseAuthor = tweet.author.toLowerCase();
+        return lowerCaseContent.includes(lowerCaseQuery) || lowerCaseAuthor.includes(lowerCaseQuery);
+      });
+
+      // Update the tweets with the filtered results
+      this.tweets = filteredTweets;
+
+      // Reset the search if search query is empty
+      if (this.searchQuery === '') {
+        this.resetSearch();
+      }
+  }
+
+  resetSearch() {
+    this.searchQuery = '';
+    this.getTweets();
   }
 
   
@@ -55,7 +104,7 @@ export class FeedComponent implements OnInit {
         timestamp: new Date(),
         likes: 0,
         comments: [],
-        retweets: 0, // Initialize retweets count to 0
+        retweets: 0, 
         commentText: '',
         commentCount: 2
       };
@@ -99,19 +148,26 @@ export class FeedComponent implements OnInit {
 
 
   submitText(tweet: Tweet) {
+
     if (this.activeTweet.commentText) {
       if (!tweet.comments) {
         tweet.comments = [];
       }
       tweet.comments.push(this.activeTweet.commentText);
       this.activeTweet.commentText = '';
-
+  
       const tweetIndex = this.tweets.findIndex(t => t === tweet);
       if (tweetIndex !== -1) {
         this.tweets[tweetIndex].commentCount += 1;
         this.tweets[tweetIndex].isCommented = true;
       }
+  
+      // Store the updated comments in local storage
+      this.saveCommentsToLocalStorage();
     }
+  }
+  private saveCommentsToLocalStorage() {
+    localStorage.setItem('comments', JSON.stringify(this.tweets.map(tweet => tweet.comments)));
   }
 
 
@@ -131,10 +187,11 @@ export class FeedComponent implements OnInit {
     };
     
     this.tweets.unshift(retweetedTweet);
+
     tweet.retweets ++;
 
-    // Add the new tweet to the tweet service
-    this.tweetService.addRetweet(retweetedTweet);
+     // Add the new tweet to the tweet service
+     this.tweetService.addRetweet(retweetedTweet);
   }
 
  

@@ -17,16 +17,16 @@
               Home
             </a>
           </div>
-          <div class="sidebar-menu__item">
-            <img src="/assets/svg/explore.svg" class="sidebar-menu__item-icon" />
+          <div class="sidebar-menu__item2">
+            <img src="/assets/svg/explore.svg" class="sidebar-menu__item-icon2" />
             Explore
           </div>
-          <div class="sidebar-menu__item">
-            <img src="/assets/svg/notifications.svg" class="sidebar-menu__item-icon"/>
+          <div class="sidebar-menu__item2">
+            <img src="/assets/svg/notifications.svg" class="sidebar-menu__item-icon2"/>
             Notifications
           </div>
-          <div class="sidebar-menu__item">
-            <img src="/assets/svg/messages.svg" class="sidebar-menu__item-icon" />
+          <div class="sidebar-menu__item2">
+            <img src="/assets/svg/messages.svg" class="sidebar-menu__item-icon2" />
             Messages
           </div>
           <div class="sidebar-menu__item sidebar-menu__item--active">
@@ -34,10 +34,6 @@
               <img src="/assets/svg/profile.svg" class="sidebar-menu__item-icon" />
               Profile
             </a>
-          </div>
-          <div class="sidebar-menu__item">
-            <img src="/assets/svg/more.svg" class="sidebar-menu__item-icon" />
-            More
           </div>
 
         </div>
@@ -123,7 +119,7 @@
                     <div class="tweet__main">
                       <div class="tweet__header">
                         <div class="tweet__author-name">
-                          {{ tweet.author }}
+                          {{ loggedInName }}
                         </div>
                         <div class="tweet__author-email">
                           - {{ tweet.email }}
@@ -252,7 +248,7 @@
               </div>
             </div>
 
-            <div class="who-to-follow__block">
+            <div class="who-to-follow__block" [routerLink]="['/follower-profile', { id: '0', name: 'David', email: 'david@gmail.com', photo: '/assets/images/profile-image-1.jpg' }]">
               <img
                 class="who-to-follow__author-logo"
                 src="/assets/images/profile-image-1.jpg"/>
@@ -271,7 +267,7 @@
               </div>
             </div>
 
-            <div class="who-to-follow__block">
+            <div class="who-to-follow__block" [routerLink]="['/follower-profile', { id: '1', name: 'Susan', email: 'susan@gmail.com', photo: '/assets/images/profile-image-2.png' }]">
               <img
                 class="who-to-follow__author-logo"
                 src="/assets/images/profile-image-2.png"/>
@@ -290,7 +286,7 @@
               </div>
             </div>
 
-            <div class="who-to-follow__block">
+            <div class="who-to-follow__block" [routerLink]="['/follower-profile', { id: '2', name: 'John', email: 'john@gmail.com', photo: '/assets/images/profile-image-3.jpg' }]">
               <img
                 class="who-to-follow__author-logo"
                 src="/assets/images/profile-image-3.jpg"/>
@@ -309,7 +305,7 @@
               </div>
             </div>
 
-            <div class="who-to-follow__block">
+            <div class="who-to-follow__block" [routerLink]="['/follower-profile', { id: '3', name: 'Teresa', email: 'teresa@gmail.com', photo: '/assets/images/profile-image-2.png' }]">
               <img
                 class="who-to-follow__author-logo"
                 src="/assets/images/profile-image-2.png"/>
@@ -328,6 +324,40 @@
               </div>
             </div>
           </div>
+
+          <br>
+
+          <div class="whats-happening">
+            <div class="whats-happening__block">
+              <div class="whats-happening__heading">
+                Whats Happening
+              </div>
+            </div>
+            <div class="whats-happening__block">
+              <div class="whats-happening__trend-name">
+                COVID-19 Vaccination Milestone
+              </div>
+              <div class="whats-happening__meta-information">
+                The global COVID-19 vaccination effort reaches a new milestone with over 1 billion doses administered worldwide.
+              </div>
+            </div>
+            <div class="whats-happening__block">
+              <div class="whats-happening__trend-name">
+                New Space Exploration Mission Announced
+              </div>
+              <div class="whats-happening__meta-information">
+                NASA announces plans for a groundbreaking mission to explore Europa, one of Jupiter's moons, in search of signs of life.
+              </div>
+            </div>
+            <div class="whats-happening__block">
+              <div class="whats-happening__trend-name">
+                Tech Giant Unveils Revolutionary New Smartphone
+              </div>
+              <div class="whats-happening__meta-information">
+                Leading tech company introduces a cutting-edge smartphone with advanced features and an innovative design.
+              </div>
+            </div>
+        </div>
 
         </div>
       </div>

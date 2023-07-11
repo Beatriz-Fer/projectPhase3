@@ -159,6 +159,7 @@ a.profile-link , a.feed-link{
     transition: opacity 0.2s ease-in-out, box-shadow 0.2s ease-in-out;
   }
 
+
   .who-to-follow__block:hover {
     opacity: 0.8;
     box-shadow: 0 0 5px rgba(0, 0, 0, 0.1);
@@ -207,7 +208,8 @@ a.profile-link , a.feed-link{
     width: 110px;
     text-align: center;
   }
-  
+
+
   .who-to-follow__button:hover {
     background: rgba(29, 161, 242, 0.1);
     cursor: pointer;
@@ -218,70 +220,6 @@ a.profile-link , a.feed-link{
     color: white;
   }
 
-/* /////////////////////////////////////////////////////////////////////////////////////////// */
-
-/* Whats Happening */
-
-.whats-happening {
-  border-radius: 15px;
-  background: #f5f8fa;
-  margin-bottom: 15px;
-}
-
-.whats-happening__block {
-  border-bottom: 1px solid #e6ecf0;
-  padding: 10px 15px;
-}
-.search__block {
-  background: #f5f8fa;
-  margin-bottom: 15px;
-  display: flex;
-  align-items: center;
-  border-bottom: 1px solid #e6ecf0;
-  border-radius: 10px;
-}
-.whats-happening__block:last-child {
-  border-bottom: none;
-}
-
-.whats-happening__heading {
-  font-size: 19px;
-  font-weight: bold;
-  color: #1da1f2;
-}
-
-.whats-happening__meta-information {
-  font-size: 13px;
-  font-weight: 300;
-  color: #657786;
-}
-
-.whats-happening__trend-name {
-  font-size: 15px;
-  color: #14171a;
-  font-weight: bold;
-  margin-bottom: 5px;
-  margin-top: 2px;
-}
-
-/* // Edit Profile // */
-
-.editprofile-button {
-  margin-top: 5px;
-  float: right;
-  border: 1px solid rgb(155, 157, 160);
-  border-radius: 20px;
-  padding: 10px;
-  cursor: pointer;
-  font-weight: bold;
-  margin-right: 10px;
-  background-color: transparent;
-}
-
-.editprofile-button:hover {
-  background-color: rgb(155, 157, 160);
-  color: #fff;
-}
 
 /* /////////////////////////////////////////////////////////////////////////////////////////// */
 
@@ -347,7 +285,7 @@ a.profile-link , a.feed-link{
 }
 
 .heading p:hover {
-    color: #1b94e0; /* Active menu item color */
+    color: #1b94e0;
 }
 .active-label {
   color: #1b94e0;
@@ -460,127 +398,35 @@ a.profile-link , a.feed-link{
   margin-left: 5px; 
 }
 
-.liked {
+.material-icons.liked {
   color: red;
   cursor: pointer;
 }
 
-/* ////////////////////////////////////////////////////////////////////////////////////////////// */
 
-/* // Pop up - Edit Profile // */
+/* /////////////////////////////////////////////////////////////////////// */
 
-.popup_container {
-  position: fixed;
-  top: 0;
-  left: 0;
-  right: 0;
-  bottom: 0;
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  z-index: 9999; /* Ensures the pop-up is on top of other elements */
-  background-color: rgba(0, 0, 0, 0.5); /* Semi-transparent background */
+/* // Follow Button // */
+
+.follow__button {
+  border: 1px solid #1da0f2;
+  color: #1da0f2;
+  font-size: 16px;
+  font-weight: 700;
+  border-radius: 15px;
+  padding: 10px;
+  width: 150px;
+  text-align: center;
 }
 
-.popup {
-  position: relative;
-  background-color: white;
-  padding: 20px;
-  border-radius: 10px;
-  max-width: 550px;
-  height: 550px;
-  overflow: auto;
-}
-
-.popup-header {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-}
-
-.popup-content {
-  margin-bottom: 50px;
-}
-
-.exit-button {
-  position: absolute;
-  top: 10px;
-  right: 10px;
-  border: none;
-  background-color: transparent;
-  color: #1DA1F2; 
-  font-size: 24px;
+.follow__button:hover {
+  background: rgba(29, 161, 242, 0.1);
   cursor: pointer;
 }
 
-.popup-content form {
-  display: flex;
-  flex-direction: column;
-}
-
-.popup-content .input-group {
-  margin-bottom: 20px;
-}
-
-.popup-content label {
-  display: block;
-  font-weight: bold;
-  margin-bottom: 5px;
-  color: #0D91ED
-}
-
-.popup-content input[type="text"],
-.popup-content textarea {
-width: 90%;
-padding: 10px;
-border: 1px solid #ccc;
-border-radius: 4px;
-outline: none;
-transition: border-color 0.3s ease;
-}
-
-.popup-content input[type="text"]:focus,
-.popup-content textarea:focus {
-border-color: #1da1f2;
-}
-
-.popup-content textarea {
-  height: 100px;
-}
-
-.popup-content img {
-  width: 125px;
-  height: 125px;
-  margin-top: 16px;
-}
-
-.photo-container {
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  margin-bottom: 15px;
-}
-
-.popup-content button[type="submit"] {
+.follow__button.followed {
   background-color: #1da1f2;
-  color: #fff;
-  border: none;
-  border-radius: 20px;
-  padding: 12px 24px;
-  font-weight: bold;
-  cursor: pointer;
+  color: white;
 }
 
-.popup-content button[type="submit"]:hover {
-  background-color: #0d8bf0;
-}
-
-.popup-content p {
-  color: #0d8bf0;
-  font-size: 10px;
-}
-
-
-
-
-
+/* /////////////////////////////////////////////////////////////////////////////////////////// */
