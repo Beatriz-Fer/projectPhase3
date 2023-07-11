@@ -137,18 +137,6 @@
                       </div>
                       <br>
                       <div class="tweet__footer">
-                        <div class="retweets-wrapper">
-                          <span class="material-icons clickable">repeat</span>
-                          <span class="retweets-count" *ngIf="tweet.retweets > 0">{{ tweet.retweets }}</span>
-                        </div>
-                        <div class="likes-wrapper">
-                          <span class="material-icons" [ngClass]="{ 'liked': tweet.isLiked }">favorite_border</span>
-                          <span class="likes-count" *ngIf="tweet.likes > 0">{{ tweet.likes }}</span>
-                        </div>
-                        <div class="comment-wrapper">
-                          <span class="material-icons clickable" [ngClass]="{ 'commented': tweet.isCommented }" >comment</span>
-                          <span class="comments-count" *ngIf="tweet.commentCount > 0">{{ tweet.commentCount }}</span>
-                        </div>
                       </div>
                     </div>
                   </div>
@@ -188,18 +176,10 @@
                       </div>
                       <br>
                       <div class="tweet__footer">
-                        <div class="retweets-wrapper">
-                          <span class="material-icons clickable" >repeat</span>
-                          <span class="retweets-count" *ngIf="tweet.retweets > 0">{{ tweet.retweets }}</span>
-                        </div>
                         <div class="likes-wrapper">
                           <span class="material-icons" [ngClass]="{ 'liked': tweet.isLiked }" >favorite_border</span>
                           <span class="likes-count" *ngIf="tweet.likes > 0">{{ tweet.likes }}</span>
                         </div>    
-                        <div class="comment-wrapper">
-                          <span class="material-icons clickable" [ngClass]="{ 'commented': tweet.isCommented }" >comment</span>
-                          <span class="comments-count" *ngIf="tweet.commentCount > 0">{{ tweet.commentCount }}</span>
-                        </div>
                       </div>
                     </div>
                   </div>
@@ -243,14 +223,6 @@
                         <div class="retweets-wrapper">
                           <span class="material-icons clickable" >repeat</span>
                           <span class="retweets-count" *ngIf="tweet.retweets > 0">{{ tweet.retweets }}</span>
-                        </div>
-                        <div class="likes-wrapper">
-                          <span class="material-icons" [ngClass]="{ 'liked': tweet.isLiked }">favorite_border</span>
-                          <span class="likes-count" *ngIf="tweet.likes > 0">{{ tweet.likes }}</span>
-                        </div>
-                        <div class="comment-wrapper">
-                          <span class="material-icons clickable" [ngClass]="{ 'commented': tweet.isCommented }" >comment</span>
-                          <span class="comments-count" *ngIf="tweet.commentCount > 0">{{ tweet.commentCount }}</span>
                         </div>
                       </div>
                     </div>

@@ -49,7 +49,6 @@ export class LoginComponent {
       this.router.navigate(['/feed']);
     } else {
       // Incorrect email or password
-      console.log("no");
       this.loginError = true;
     }
   }

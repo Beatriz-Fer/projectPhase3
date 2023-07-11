@@ -122,24 +122,24 @@ https://www.youtube.com/watch?v=FThtv9iorao -->
                     <button (click)="submitText(tweet)" class="comment-submit-button">Submit</button>
                   </div>
                   <div class="comment_section">
+                    <p class="comment_section_p">Comments:</p>
                     <div *ngIf="tweet.comments && tweet.comments.length > 0" >
-                      <p class="comment_section_p">Comments:</p>
                       <ul>
                         <li *ngFor="let text of tweet.comments">
                           <div class="comment">
                             <p class="comment-text">{{ text }}</p>
-                            <p class="comment-author">@{{ loggedInEmail }} {{ tweet.timestamp | date : 'short' }} </p>
+                            <p class="comment-author">- {{ loggedInEmail }} {{ tweet.timestamp | date : 'short' }} </p>
                           </div>
                         </li>
                       </ul>
                     </div>
                     <div class="comment">
                       <p class="comment-text">Adipiscing at in tellus integer feugiat scelerisque. Velit aliquet sagittis id consectetur purus ut.</p>
-                      <p class="comment-author">@David 7/6/23, 11:45 AM </p>
+                      <p class="comment-author">- david@gmail.com 7/6/23, 11:45 AM </p>
                     </div>
                     <div class="comment">
                       <p class="comment-text">Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.</p>
-                      <p class="comment-author">@Susan 7/6/23, 10:15 AM </p>
+                      <p class="comment-author">- susan@gmail.com 7/6/23, 10:15 AM </p>
                     </div>
                   </div>
                 </div>    

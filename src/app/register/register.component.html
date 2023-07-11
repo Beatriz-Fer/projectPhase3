@@ -11,16 +11,18 @@
           <form (ngSubmit)="register()" #registrationForm="ngForm">
           <div class="input-group">
             <input type="text" id="name" name="name" required [(ngModel)]="user.name" placeholder="Name" />
+            <div *ngIf="nameError" class="error">Invalid Name.<br> <h5>Must be less than 20 characters.</h5></div>
           </div>
           <br>
           <div class="input-group">
             <input type="email" id="email" name="email" required [(ngModel)]="user.email" placeholder="Email" >
-            <div *ngIf="emailError" class="error">Invalid email address.</div>
+            <div *ngIf="emailError" class="error">Invalid email address.<br> <h5> Must be in correct email format.</h5></div>
           </div>
           <br>
           <div class="input-group">
             <input type="password" id="password" name="password" required [(ngModel)]="user.password" placeholder="Password" />
-            <div *ngIf="passwordError" class="error">Password must have at least 8 characters.</div>
+            <div *ngIf="passwordError" class="error">Invalid Password. <br> <h5>Must be greater than 8 and less than 12.<br> 
+              Include 1 special character, 1 letter and 1 capital letter.</h5></div>
           </div>
           <br>
           <button class="btn-sign-up" type="submit" [disabled]="registrationForm.invalid">Sign Up</button>
