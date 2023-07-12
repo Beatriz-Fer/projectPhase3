@@ -1,6 +1,7 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, OnDestroy } from '@angular/core';
 import { Tweet } from '../tweet';
 import { TweetService } from '../tweet.service';
+import { Router } from '@angular/router';
 
 
 @Component({
@@ -8,7 +9,7 @@ import { TweetService } from '../tweet.service';
   templateUrl: './feed.component.html',
   styleUrls: ['./feed.component.css']
 })
-export class FeedComponent implements OnInit {
+export class FeedComponent implements OnInit, OnDestroy {
 
   tweets: Tweet[] = [];
 
@@ -23,7 +24,7 @@ export class FeedComponent implements OnInit {
 
   searchQuery: string = '';
 
-  constructor(private tweetService: TweetService) {
+  constructor(private tweetService: TweetService, private router: Router) {
   }
 
 
@@ -36,7 +37,7 @@ export class FeedComponent implements OnInit {
 
     this.getTweets();
 
-     // Retrieve the comments from local storage
+    // Retrieve the comments from local storage when the component is initialized
     const savedComments = localStorage.getItem('comments');
     if (savedComments) {
       const parsedComments = JSON.parse(savedComments);
@@ -48,7 +49,32 @@ export class FeedComponent implements OnInit {
 
   }
 
+  ngOnDestroy() {
+    // Save the comments to local storage when the component is destroyed (user leaves the page)
+    this.saveCommentsToLocalStorage();
+  }
+
+
+  logout() {
+    // Clear the comments and update the comment count for each tweet
+    this.tweets.forEach((tweet) => {
+      tweet.comments = [];
+      tweet.commentCount = 0;
+    });
+
+    // Save the updated comments to local storage
+    this.saveCommentsToLocalStorage();
+
+    // Clear the local storage
+    localStorage.clear();
+    // Refresh page to mimic closing the application
+    window.location.href = '/';
+
+    this.router.navigate(['/register']);
+  }
   
+
+
   private getTweets() {
 
     const tweets = this.tweetService.getTweets();
@@ -70,21 +96,21 @@ export class FeedComponent implements OnInit {
 
 
   searchTweets() {
-      // Perform the search based on the searchQuery
-      const filteredTweets = this.tweets.filter((tweet) => {
-        const lowerCaseQuery = this.searchQuery.toLowerCase();
-        const lowerCaseContent = tweet.content.toLowerCase();
-        const lowerCaseAuthor = tweet.author.toLowerCase();
-        return lowerCaseContent.includes(lowerCaseQuery) || lowerCaseAuthor.includes(lowerCaseQuery);
-      });
+    // Perform the search based on the searchQuery
+    const filteredTweets = this.tweets.filter((tweet) => {
+      const lowerCaseQuery = this.searchQuery.toLowerCase();
+      const lowerCaseContent = tweet.content.toLowerCase();
+      const lowerCaseAuthor = tweet.author.toLowerCase();
+      return lowerCaseContent.includes(lowerCaseQuery) || lowerCaseAuthor.includes(lowerCaseQuery);
+    });
 
-      // Update the tweets with the filtered results
-      this.tweets = filteredTweets;
+    // Update the tweets with the filtered results
+    this.tweets = filteredTweets;
 
-      // Reset the search if search query is empty
-      if (this.searchQuery === '') {
-        this.resetSearch();
-      }
+    // Reset the search if search query is empty
+    if (this.searchQuery === '') {
+      this.resetSearch();
+    }
   }
 
   resetSearch() {

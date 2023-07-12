@@ -115,7 +115,7 @@
               <div *ngIf="userTweets.length > 0">
                 <div *ngFor="let tweet of userTweets">
                   <div class="tweet">
-                    <img class="tweet__author-logo" src="{{ tweet.profilePic }}" />
+                    <img class="tweet__author-logo" src="{{ loggedInPhoto }}" />
                     <div class="tweet__main">
                       <div class="tweet__header">
                         <div class="tweet__author-name">
@@ -195,11 +195,11 @@
               <div *ngIf="retweetedTweets.length > 0">
                 <div *ngFor="let tweet of retweetedTweets">
                   <div class="tweet">
-                    <img class="tweet__author-logo" src="{{ tweet.profilePic }}" />
+                    <img class="tweet__author-logo" src="{{ loggedInPhoto }}" />
                     <div class="tweet__main">
                       <div class="tweet__header">
                         <div class="tweet__author-name">
-                          {{ tweet.author }}
+                          {{ loggedInName }}
                         </div>
                         <div class="tweet__author-email">
                           - {{ tweet.email }}
@@ -240,7 +240,7 @@
       <!-- SideBar Content -->
       <div class="layout__right-sidebar-container">
         <div class="layout__right-sidebar">
-         <br>
+          <br>
           <div class="who-to-follow">
             <div class="who-to-follow__block">
               <div class="who-to-follow__heading">

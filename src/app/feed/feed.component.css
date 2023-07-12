@@ -478,3 +478,17 @@ html {
   }
 
   /* //////////////////////////////////////////////////////////////////////////////// */
+
+  /* // Log Out // */
+
+  .logOutButton {
+    background-color: #1da1f2;
+    border: none;
+    color: white;
+    font-weight: 900;
+    border-radius: 30px;
+    width: 125px;
+    height: 40px;
+    margin-top: 20px;
+    margin-left: 220px;
+  }

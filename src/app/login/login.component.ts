@@ -12,7 +12,7 @@ export class LoginComponent {
     email: '',
     password: '',
     bio: 'Hello, this is a sample bio',
-    photo: '/assets/images/profile-image-2.png'
+    photo: '/assets/images/profile-image-4.jpg'
   };
   loginError = false;
   registrationSuccess = false;
