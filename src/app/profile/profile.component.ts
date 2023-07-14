@@ -52,6 +52,8 @@ export class ProfileComponent implements OnInit, OnDestroy{
   this.loggedInBio = localStorage.getItem('loggedInBio') || '';
   this.loggedInPhoto = localStorage.getItem('loggedInPhoto') || '';
 
+  const savedUserTweets = localStorage.getItem('tweets') || '';
+
   // Following
   const storedFollowedState = localStorage.getItem('followedState');
   const storedFollowingCount = localStorage.getItem('followingCount');
@@ -65,21 +67,22 @@ export class ProfileComponent implements OnInit, OnDestroy{
   }
   
 
-  // Retrieve all the tweets from the TweetService
-  const allTweets = this.tweetService.getTweets();
-  // Filter the tweets based on the logged-in user's email
-  this.userTweets = allTweets.filter(tweet => tweet.email === this.loggedInEmail);
+  //getting the users tweets, liked tweets and retweets based on actions took in feed page
+  if (savedUserTweets) {
+    this.userTweets = JSON.parse(savedUserTweets)
+  .filter((tweet: { email: string, originalAuthor?: string }) => {
+    return tweet.email === this.loggedInEmail && !tweet.originalAuthor;
+  });
+    
+    this.likedTweets = JSON.parse(savedUserTweets).filter((tweet: { isLiked: boolean; }) => tweet.isLiked === true);
 
-  // Retrieve the liked tweets from the TweetService
-  const likedTweetsArray = this.tweetService.getLikes();
-  this.likedTweets = likedTweetsArray;
-
-  // Retrieve all the retweets from the TweetService
-  const allRetweets = this.tweetService.getRetweets();
-   // Filter the tweets based on the logged-in user's email
-  this.retweetedTweets = allRetweets.filter(tweet => tweet.email === this.loggedInEmail);
-
+    this.retweetedTweets = JSON.parse(savedUserTweets)
+    .filter((tweet: { email: string, originalAuthor?: string }) => {
+      return tweet.email === this.loggedInEmail && tweet.originalAuthor;
+    });
+  }
 }
+
 
 ngOnDestroy(): void {
   // Save followed state and following count to browser storage
@@ -88,6 +91,7 @@ ngOnDestroy(): void {
 }
 
 
+// Edit pop up box
 openPopup() {
   this.showPopup = true;
 }
@@ -107,6 +111,7 @@ saveChanges() {
 }
 
 
+// follow button to increment or decrement following number
 toggleFollow(index: number): void {
   const button = this.followButtons[index];
   button.followed = !button.followed;
@@ -119,6 +124,7 @@ isFollowed(buttonIndex: number): boolean {
 }
 
 
+// change content at botton of page
 changeContent(label: string) {
   this.activeLabel = label;
 }

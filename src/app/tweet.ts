@@ -8,6 +8,7 @@ export interface Tweet {
   isLiked?: boolean; // Optional 
   comments?: string[];
   originalAuthor?: string; // Optional
+  originalDate?: Date;
   retweets: number; 
   commentText?: string; // Optional
   isCommented?: boolean; // Optional

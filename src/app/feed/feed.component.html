@@ -58,6 +58,7 @@
         </div>
 
 
+        <!-- Feed -->
         <div *ngIf="tweets.length > 0" >
           <div *ngFor="let tweet of tweets">
             <div class="tweet" >
@@ -77,7 +78,7 @@
                   </div>
                 </div>
                 <div *ngIf="tweet.originalAuthor" class="post__originalAuthor">
-                  <p class="retweet-info">Reposted Tweet - originally created by: {{ tweet.originalAuthor }} ({{ tweet.timestamp | date : 'short' }})</p>
+                  <p class="retweet-info">Reposted Tweet - originally created by: {{ tweet.originalAuthor }} ({{ tweet.originalDate | date : 'short' }})</p>
                 </div>           
                 <div class="tweet__content" [innerHTML]="tweet.content">
                   {{ tweet.content }}
@@ -99,7 +100,8 @@
                 </div>
               </div>
 
-
+              
+              <!-- Comment pop up box  -->
               <div class="popup_container" *ngIf="tweet === activeTweet">
                 <div class="popup">
                   <div class="popup-header">
@@ -140,6 +142,8 @@
 
       </div>
       
+
+      <!-- Right sidebar -->
       <div class="layout__right-sidebar-container">
         <div class="layout__right-sidebar">
           <button class="logOutButton clickable" (click)="logout()">Logout</button>

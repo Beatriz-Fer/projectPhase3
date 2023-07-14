@@ -3,7 +3,6 @@ import { Tweet } from '../tweet';
 import { TweetService } from '../tweet.service';
 import { Router } from '@angular/router';
 
-
 @Component({
   selector: 'app-feed',
   templateUrl: './feed.component.html',
@@ -37,7 +36,36 @@ export class FeedComponent implements OnInit, OnDestroy {
 
     this.getTweets();
 
-    // Retrieve the comments from local storage when the component is initialized
+    // Retrieve the tweets from local storage when the component is initialized
+    this.retrieveTweetsFromLocalStorage();
+    
+     // Retrieve the comments from local storage 
+    this.retrieveCommentsFromLocalStorage();   
+
+  }
+
+
+  ngOnDestroy() {
+    // Save the comments to local storage when the component is destroyed (user leaves the page)
+    this.saveCommentsToLocalStorage();
+
+     // Save the tweets to local storage
+    this.saveTweetsToLocalStorage();
+
+    window.location.reload();
+
+  }
+
+
+  retrieveTweetsFromLocalStorage() {
+    const savedTweets = localStorage.getItem('tweets');
+    if (savedTweets) {
+      this.tweets = JSON.parse(savedTweets);
+    }
+  }
+
+
+  retrieveCommentsFromLocalStorage() {
     const savedComments = localStorage.getItem('comments');
     if (savedComments) {
       const parsedComments = JSON.parse(savedComments);
@@ -46,27 +74,27 @@ export class FeedComponent implements OnInit, OnDestroy {
         tweet.commentCount = (tweet.comments?.length || 0) + 2; // updates comment count
       });
     }
-
-  }
-
-  ngOnDestroy() {
-    // Save the comments to local storage when the component is destroyed (user leaves the page)
-    this.saveCommentsToLocalStorage();
   }
 
 
-  logout() {
+ logout() {
     // Clear the comments and update the comment count for each tweet
     this.tweets.forEach((tweet) => {
       tweet.comments = [];
       tweet.commentCount = 0;
+      tweet.retweets = 0;
+      tweet.isLiked = false;
+      tweet.likes--;
     });
+
+    this.getTweets();
 
     // Save the updated comments to local storage
     this.saveCommentsToLocalStorage();
 
     // Clear the local storage
     localStorage.clear();
+
     // Refresh page to mimic closing the application
     window.location.href = '/';
 
@@ -95,6 +123,13 @@ export class FeedComponent implements OnInit, OnDestroy {
   }
 
 
+  // save tweets to local storage
+  private saveTweetsToLocalStorage() {
+    localStorage.setItem('tweets', JSON.stringify(this.tweets));
+   
+  }
+
+
   searchTweets() {
     // Perform the search based on the searchQuery
     const filteredTweets = this.tweets.filter((tweet) => {
@@ -117,7 +152,6 @@ export class FeedComponent implements OnInit, OnDestroy {
     this.searchQuery = '';
     this.getTweets();
   }
-
   
   createTweet() {
     // Check if the tweet content is not empty and within the character limit
@@ -143,10 +177,15 @@ export class FeedComponent implements OnInit, OnDestroy {
 
       // Clear the tweet input field
       this.newTweetContent = '';
+
+      // Save the tweets to local storage after adding a new tweet
+      this.saveTweetsToLocalStorage();
+      this.tweets.sort((a, b) => b.timestamp.getTime() - a.timestamp.getTime());
     }
   }
 
 
+  // when the liked button is clicked
   toggleLike(tweet: Tweet) {
 
     if (tweet.isLiked) {
@@ -155,6 +194,10 @@ export class FeedComponent implements OnInit, OnDestroy {
       this.tweetService.addLike(tweet);
     }
     tweet.isLiked = !tweet.isLiked;
+
+    // Save the liked tweets to local storage after 
+    this.saveTweetsToLocalStorage();
+    this.tweets.sort((a, b) => b.timestamp.getTime() - a.timestamp.getTime());
   }
 
 
@@ -167,12 +210,12 @@ export class FeedComponent implements OnInit, OnDestroy {
     }
    }
 
-
   closePopup() {
     this.activeTweet = null;
   }
 
 
+  // writing a comment
   submitText(tweet: Tweet) {
 
     if (this.activeTweet.commentText) {
@@ -208,6 +251,7 @@ export class FeedComponent implements OnInit, OnDestroy {
       likes: 0,
       comments: [],
       originalAuthor: tweet.author, // Add the original author to the retweeted tweet
+      originalDate: tweet.timestamp,
       retweets: 0, 
       commentCount: 2
     };
@@ -216,8 +260,12 @@ export class FeedComponent implements OnInit, OnDestroy {
 
     tweet.retweets ++;
 
-     // Add the new tweet to the tweet service
-     this.tweetService.addRetweet(retweetedTweet);
+    // Add the new tweet to the tweet service
+    this.tweetService.addRetweet(retweetedTweet);
+
+    // Save the tweets to local storage after adding a new tweet
+    this.saveTweetsToLocalStorage();
+    this.tweets.sort((a, b) => b.timestamp.getTime() - a.timestamp.getTime());
   }
 
  

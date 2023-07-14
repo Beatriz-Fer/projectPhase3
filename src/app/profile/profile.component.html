@@ -5,6 +5,8 @@
     <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet" />
   </head>
   <body>
+
+    <!-- left side navigation pane -->
     <div class="layout">
       <div class="layout__left-sidebar">
         <div class="sidebar-menu">
@@ -40,6 +42,7 @@
       </div>
       
 
+      <!-- main content -->
       <div class="layout__main">
         <div class="profile">
           <div class="profile-header">
@@ -62,7 +65,8 @@
                 </div>
               </div>
 
-
+              
+              <!-- make changes - edit - pop up box -->
               <div class="popup_container" *ngIf="showPopup">
                 <div class="popup" style="width:530px; height:705px;">
 
@@ -98,6 +102,7 @@
           </div>
         
 
+          <!-- bottom page content -->
           <div class="profile-content">
 
             <section class="tweets">
@@ -165,7 +170,7 @@
                         </div>
                       </div>
                       <div *ngIf="tweet.originalAuthor" class="post__originalAuthor">
-                        <p class="retweet-info">Reposted Tweet - originally created by: {{ tweet.originalAuthor }} ({{ tweet.timestamp | date : 'short' }})</p>
+                        <p class="retweet-info">Reposted Tweet - originally created by: {{ tweet.originalAuthor }} ({{ tweet.originalDate | date : 'short' }})</p>
                       </div> 
                       <div class="tweet__content">
                         {{ tweet.content }}
@@ -209,7 +214,7 @@
                         </div>
                       </div>
                       <div *ngIf="tweet.originalAuthor" class="post__originalAuthor">
-                        <p class="retweet-info">Reposted Tweet - originally created by: {{ tweet.originalAuthor }} ({{ tweet.timestamp | date : 'short' }})</p>
+                        <p class="retweet-info">Reposted Tweet - originally created by: {{ tweet.originalAuthor }} ({{ tweet.originalDate | date : 'short' }})</p>
                       </div>           
                       <div class="tweet__content" [innerHTML]="tweet.content">
                         {{ tweet.content }}
@@ -237,7 +242,7 @@
         </div>
       </div>
 
-      <!-- SideBar Content -->
+      <!-- Right SideBar Content -->
       <div class="layout__right-sidebar-container">
         <div class="layout__right-sidebar">
           <br>

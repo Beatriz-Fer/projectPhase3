@@ -9,11 +9,13 @@ export class TweetService {
 
   constructor() { }
 
+  // get the information stored in local storage
   loggedInName = localStorage.getItem('loggedInName') || '';
   loggedInEmail = localStorage.getItem('loggedInEmail') || '';
   loggedInBio = localStorage.getItem('loggedInBio') || '';
   loggedInPhoto = localStorage.getItem('loggedInPhoto') || '';
 
+  // empty arrays to hold tweets, liked tweets and retweets
   tweets: Tweet[] = [];
   retweets: Tweet[] = [];
   likes: Tweet[] = [];
@@ -24,6 +26,7 @@ export class TweetService {
   allTweets: Tweet[] = [];
 
 
+  // gets all the user tweets as well as dummy tweets
   getTweets() {
     this.allTweets = [
       ...this.tweets,
@@ -33,37 +36,47 @@ export class TweetService {
   return this.allTweets;
 }
 
-
+//adding a tweet
   addTweet(tweet: Tweet)  {
     this.tweets.unshift(tweet);
   }
 
 
+ // adding a retweet 
   addRetweet(tweet: Tweet) {
-    tweet.retweets ++;
     this.retweets.unshift(tweet);
   }
 
+
+  // getting the retweets
   getRetweets() {
     return this.retweets;
   }
 
 
+// adding a like
   addLike(tweet : Tweet){
     tweet.likes++;
     this.likes.unshift(tweet);
   }
 
+
+  // removing a like 
   removeLike(tweet : Tweet){
     tweet.likes--;
     this.likes = this.likes.filter(t => t !== tweet);
   }
 
+
+  //get the liked tweets
   getLikes() {
     return this.likes;
   }
 
 
+
+// dummy data to fill the feed page
+// user dummy tweets  
   getDummyUserData(){
     this.userTweets = [
       {
@@ -93,7 +106,7 @@ export class TweetService {
   }
 
 
-
+// followers dummy tweets
   getDummyFollowerData(){
     this.followedTweets = [
       { 
