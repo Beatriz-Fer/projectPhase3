@@ -18,7 +18,7 @@ export class ProfileComponent implements OnInit, OnDestroy{
   loggedInEmail: string = '';
   loggedInName: string = '';
   loggedInBio: string = '';
-  loggedInPhoto: string = '';
+  loggedInPhoto: string | null = null;
 
   showUserTweets: boolean = true;
   showUserLikedTweets: boolean = false;
@@ -37,7 +37,6 @@ export class ProfileComponent implements OnInit, OnDestroy{
     { label: 'Follow 3', followed: false },
     { label: 'Follow 4', followed: false }
   ];
-
 
   constructor(private tweetService: TweetService){
     
@@ -96,15 +95,37 @@ openPopup() {
   this.showPopup = true;
 }
 
+
+// select a profile image from files
+onFileSelected(event: any) {
+  const file: File = event.target.files[0];
+
+  if (file) {
+    const reader = new FileReader();
+
+    reader.onload = (e: any) => {
+      this.loggedInPhoto = e.target.result;
+    };
+
+    reader.readAsDataURL(file);
+  }
+}
+
+
 closePopup() {
   this.showPopup = false;
 }
 
+
 saveChanges() {
+
+  // Convert the loggedInPhoto to a string before storing it in localStorage
+  const photoString = this.loggedInPhoto ? this.loggedInPhoto.toString() : '';
+  localStorage.setItem('loggedInPhoto', photoString);
+
   // Perform the logic to save the changes
   localStorage.setItem('loggedInName', this.loggedInName);
   localStorage.setItem('loggedInBio', this.loggedInBio);
-  localStorage.setItem('loggedInPhoto', this.loggedInPhoto);
 
   // Close the popup box
   this.showPopup = false;
