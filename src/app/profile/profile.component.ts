@@ -45,7 +45,7 @@ export class ProfileComponent implements OnInit, OnDestroy{
 
   ngOnInit() { 
 
-  // Retrieve the logged-in email from the UserService
+  // Retrieve the logged-in information and tweets
   this.loggedInEmail = localStorage.getItem('loggedInEmail') || '';
   this.loggedInName = localStorage.getItem('loggedInName') || '';
   this.loggedInBio = localStorage.getItem('loggedInBio') || '';
@@ -53,7 +53,7 @@ export class ProfileComponent implements OnInit, OnDestroy{
 
   const savedUserTweets = localStorage.getItem('tweets') || '';
 
-  // Following
+  // Following button state and count
   const storedFollowedState = localStorage.getItem('followedState');
   const storedFollowingCount = localStorage.getItem('followingCount');
 
@@ -145,7 +145,7 @@ isFollowed(buttonIndex: number): boolean {
 }
 
 
-// change content at botton of page
+// change content at bottom of page
 changeContent(label: string) {
   this.activeLabel = label;
 }

@@ -23,7 +23,7 @@ export class FeedComponent implements OnInit, OnDestroy {
 
   searchQuery: string = '';
 
-  constructor(private tweetService: TweetService, private router: Router) {
+  constructor(private tweetService: TweetService, private router: Router) {  
   }
 
 
@@ -60,7 +60,15 @@ export class FeedComponent implements OnInit, OnDestroy {
   retrieveTweetsFromLocalStorage() {
     const savedTweets = localStorage.getItem('tweets');
     if (savedTweets) {
-      this.tweets = JSON.parse(savedTweets);
+      const parsedTweets = JSON.parse(savedTweets);
+      this.tweets = parsedTweets.map((tweet: Tweet) => {
+        // Check if the logged-in user has changed their name/ profile pic
+        if (tweet.email === this.loggedInEmail) {
+          tweet.author = this.loggedInName;
+          tweet.profilePic = this.loggedInPhoto;
+        }
+        return tweet;
+      });
     }
   }
 
@@ -78,7 +86,7 @@ export class FeedComponent implements OnInit, OnDestroy {
 
 
  logout() {
-    // Clear the comments and update the comment count for each tweet
+    // Clears the comments, likes and retweets
     this.tweets.forEach((tweet) => {
       tweet.comments = [];
       tweet.commentCount = 0;
@@ -104,7 +112,7 @@ export class FeedComponent implements OnInit, OnDestroy {
 
 
   private getTweets() {
-
+    // getting the retweets, likes and dummy tweets
     const tweets = this.tweetService.getTweets();
     const retweets = this.tweetService.getRetweets();
     const likes = this.tweetService.getLikes();
@@ -148,6 +156,7 @@ export class FeedComponent implements OnInit, OnDestroy {
     }
   }
 
+  // reset the search
   resetSearch() {
     this.searchQuery = '';
     this.getTweets();
