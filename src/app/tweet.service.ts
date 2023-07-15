@@ -27,6 +27,7 @@ export class TweetService {
     this.getStoredInfo();
   }
 
+  // get local stored data
   getStoredInfo(){
   this.loggedInName = localStorage.getItem('loggedInName') || '';
   this.loggedInEmail = localStorage.getItem('loggedInEmail') || '';

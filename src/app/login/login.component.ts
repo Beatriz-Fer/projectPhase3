@@ -7,6 +7,8 @@ import { Router, ActivatedRoute } from '@angular/router';
   styleUrls: ['./login.component.css']
 })
 export class LoginComponent {
+
+  // default values
   user = {
     name: '',
     email: '',

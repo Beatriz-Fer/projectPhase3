@@ -11,6 +11,7 @@
 
           <img src="/assets/svg/twitter.svg" class="logo" />
 
+          <!-- left side navigation pane -->
           <div class="sidebar-menu__item">
             <a routerLink="/feed" class="profile-link">
                 <img src="/assets/svg/home.svg" class="sidebar-menu__item-icon" />
@@ -40,6 +41,7 @@
       </div>
       
 
+      <!-- main content of page -->
       <div class="layout__main">
         <div class="profile">
           <div class="profile-header">
@@ -67,6 +69,7 @@
           </div>
         
 
+          <!-- bottom section of page showing tweets -->
           <div class="profile-content">
 
             <section class="tweets">
@@ -78,7 +81,7 @@
               <hr>
             </section>
 
-           
+           <!-- created tweets by user -->
             <section *ngIf="activeLabel === 'tweets'">
                   <div class="tweet">
                     <img class="tweet__author-logo" src="{{ followerPhoto }}" />
@@ -105,7 +108,7 @@
             </section>
 
 
-          
+          <!-- liked tweets by user -->
             <section *ngIf="activeLabel === 'likedTweets'">
                   <div class="tweet">
                     <img class="tweet__author-logo" src="/assets/images/profile-image-1.jpg" />
@@ -136,7 +139,7 @@
             </section>
 
 
-           
+           <!-- retweets by user -->
             <section  *ngIf="activeLabel === 'retweets'">
                   <div class="tweet">
                     <img class="tweet__author-logo" src="{{ followerPhoto }}" />
@@ -204,6 +207,7 @@
                 </a>
             </div>
 
+            <!-- who to follow section -->
             <br>
             <div class="who-to-follow">
                 <div class="who-to-follow__block">

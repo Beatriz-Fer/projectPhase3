@@ -73,6 +73,7 @@ ngOnDestroy(): void {
 }
 
 
+// follow button
 toggleFollow(followerId: number): void {
   const button = this.followButtons[followerId];
   button.followed = !button.followed;
@@ -85,6 +86,7 @@ isFollowed(buttonIndex: number): boolean {
 }
 
 
+// change bottom section of page view
 changeContent(label: string) {
   this.activeLabel = label;
 }

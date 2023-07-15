@@ -8,6 +8,7 @@
         <div class="middle">
           <span class="icon icon--bird"></span>
           <h2>Join the community! <br> Register for Twitter today</h2>
+          <!-- begining of form  -->
           <form (ngSubmit)="register()" #registrationForm="ngForm">
           <div class="input-group">
             <input type="text" id="name" name="name" required [(ngModel)]="user.name" placeholder="Name" />
@@ -27,6 +28,7 @@
           <br>
           <button class="btn-sign-up" type="submit" [disabled]="registrationForm.invalid">Sign Up</button>
         </form>
+        <!-- end of form -->
         </div>
       </div>
     </div>

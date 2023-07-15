@@ -102,11 +102,9 @@ onFileSelected(event: any) {
 
   if (file) {
     const reader = new FileReader();
-
     reader.onload = (e: any) => {
       this.loggedInPhoto = e.target.result;
     };
-
     reader.readAsDataURL(file);
   }
 }
