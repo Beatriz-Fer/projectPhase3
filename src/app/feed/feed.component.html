@@ -119,7 +119,7 @@
                         <li *ngFor="let text of tweet.comments">
                           <div class="comment">
                             <p class="comment-text">{{ text }}</p>
-                            <p class="comment-author">- {{ loggedInEmail }} {{ tweet.timestamp | date : 'short' }} </p>
+                            <p class="comment-author">- {{ loggedInEmail }} {{ currentDateTimestamp | date : 'short' }} </p>
                           </div>
                         </li>
                       </ul>

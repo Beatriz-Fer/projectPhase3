@@ -20,10 +20,12 @@ export class FeedComponent implements OnInit, OnDestroy {
   newTweetContent: string = '';
 
   activeTweet: any = null;
+  currentDateTimestamp: Date = new Date();
 
   searchQuery: string = '';
 
   constructor(private tweetService: TweetService, private router: Router) {  
+    this.currentDateTimestamp = new Date();
   }
 
 
@@ -238,6 +240,7 @@ export class FeedComponent implements OnInit, OnDestroy {
       if (tweetIndex !== -1) {
         this.tweets[tweetIndex].commentCount += 1;
         this.tweets[tweetIndex].isCommented = true;
+        this.tweets[tweetIndex].commentDate = this.currentDateTimestamp;
       }
   
       // Store the updated comments in local storage

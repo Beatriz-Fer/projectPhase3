@@ -5,18 +5,13 @@ export interface Tweet {
   content: string;
   timestamp: Date;
   likes: number;
-  isLiked?: boolean; // Optional 
+  isLiked?: boolean;
   comments?: string[];
-  originalAuthor?: string; // Optional
+  commentDate?: Date;
+  commentText?: string; 
+  isCommented?: boolean; 
+  commentCount: number;
+  originalAuthor?: string;
   originalDate?: Date;
   retweets: number; 
-  commentText?: string; // Optional
-  isCommented?: boolean; // Optional
-  commentCount: number;
-}
-
-export interface Comment {
-    author: string;
-    content: string;
-    timestamp: Date;
 }
