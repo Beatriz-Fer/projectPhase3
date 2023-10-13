@@ -1,5 +1,8 @@
 import { Component, OnInit, OnDestroy } from '@angular/core';
 import { ActivatedRoute } from '@angular/router';
+import { UserService } from '../user.service';
+import { User } from '../UserModel';
+import { TweetModel } from '../TweetModel';
 
 @Component({
   selector: 'app-follower-profile',
@@ -8,89 +11,84 @@ import { ActivatedRoute } from '@angular/router';
 })
 export class FollowerProfileComponent implements OnInit, OnDestroy {
 
-followerName!: string;
-followerEmail!: string;
-followerPhoto!: string;
-followerId!: string;
+  id!: number;
+  user!: User;
 
-showUserTweets: boolean = true;
-showUserLikedTweets: boolean = false;
-showUserRetweets: boolean = false;
+  showUserTweets: boolean = true;
+  showUserLikedTweets: boolean = false;
+  showUserRetweets: boolean = false;
 
-activeLabel: string = 'tweets';
+  activeLabel: string = 'tweets';
+  followingCount = 500;
 
-followingCount = 500;
+  userTweets$: Array<TweetModel>;
+  userRetweets$: Array<TweetModel>;
+  userLikedTweets$: Array<TweetModel>;
 
-followButtons = [
-  { label: 'Follow 1', followed: false },
-  { label: 'Follow 2', followed: false },
-  { label: 'Follow 3', followed: false },
-  { label: 'Follow 4', followed: false }
-];
-
-loggedInEmail: string = '';
-loggedInName: string = '';
-loggedInBio: string = '';
-loggedInPhoto: string = '';
-
-constructor(private route: ActivatedRoute) {}
+constructor(private route: ActivatedRoute, private userService: UserService) {
+  this.userTweets$ = new Array();
+  this.userRetweets$ = new Array();
+  this.userLikedTweets$ = new Array();
+}
 
 ngOnInit() {
+ this.route.params.subscribe(params => {
+  this.id = params['id'];
+  this.userService.getUser(this.id).subscribe(user => {
+    this.user = user;
+  })
+ })
 
-   // Retrieve the logged-in info 
-   this.loggedInEmail = localStorage.getItem('loggedInEmail') || '';
-   this.loggedInName = localStorage.getItem('loggedInName') || '';
-   this.loggedInBio = localStorage.getItem('loggedInBio') || '';
-   this.loggedInPhoto = localStorage.getItem('loggedInPhoto') || '';
+ // retrieving user tweets
+  this.userService.getUserTweets(this.id).subscribe((tweets) => {
+    this.userTweets$ = tweets;
+  });
 
-  this.route.params.subscribe(params => {
-    this.followerName = params['name'];
-    this.followerEmail = params['email'];
-    this.followerPhoto = params['photo'];
-    this.followerId = params['id'];
+  // retrieving user retweets
+  this.userService.getUserRetweets(this.id).subscribe((tweets) => {
+    this.userRetweets$ = tweets;
+  });
 
-    // Following
+  // retrieving user liked tweets
+  this.userService.getUserLikedTweets(this.id).subscribe((tweets) => {
+    this.userLikedTweets$ = tweets;
+  });
+
+  // Following
   const storedFollowedState = localStorage.getItem('followedState');
   const storedFollowingCount = localStorage.getItem('followingCount');
 
-  
   if (storedFollowedState) {
-    this.followButtons = JSON.parse(storedFollowedState);
+    this.user.followed = JSON.parse(storedFollowedState);
   }
 
   if (storedFollowingCount) {
     this.followingCount = Number(storedFollowingCount);
   }
-  
-  });
 
 }
+
 
 ngOnDestroy(): void {
   // Save followed state and following count to browser storage
-  localStorage.setItem('followedState', JSON.stringify(this.followButtons));
+  localStorage.setItem('followedState', JSON.stringify(this.user.followed));
   localStorage.setItem('followingCount', this.followingCount.toString());
 }
 
-
 // follow button
-toggleFollow(followerId: number): void {
-  const button = this.followButtons[followerId];
-  button.followed = !button.followed;
-  this.followingCount += button.followed ? 1 : -1;
+toggleFollow(user: User): void {
+  user.followed = !user.followed;
+  this.followingCount += user.followed ? 1: -1;
 }
 
-
-isFollowed(buttonIndex: number): boolean {
-  return this.followButtons[buttonIndex].followed;
+isFollowed(user: User): boolean {
+  return user.followed;
 }
-
 
 // change bottom section of page view
 changeContent(label: string) {
   this.activeLabel = label;
 }
-
 
 showTweets() {
   this.showUserTweets = true;

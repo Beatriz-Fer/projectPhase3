@@ -187,10 +187,12 @@ a.profile-link , a.feed-link{
   
   .who-to-follow__content {
     display: flex;
-    justify-content: space-between;
+    /* align-items: center; */
+    flex-direction:column;
+    /* justify-content: space-between; */
     width: 100%;
   }
-  
+
   .who-to-follow__heading {
     font-size: 19px;
     font-weight: bold;
@@ -204,8 +206,10 @@ a.profile-link , a.feed-link{
     font-weight: 700;
     border-radius: 15px;
     padding: 1px;
-    width: 110px;
+    width: 200px;
+    height: 30px;
     text-align: center;
+    align-content: center;
   }
   
   .who-to-follow__button:hover {

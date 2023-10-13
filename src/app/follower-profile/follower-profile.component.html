@@ -14,9 +14,9 @@
           <!-- left side navigation pane -->
           <div class="sidebar-menu__item">
             <a routerLink="/feed" class="profile-link">
-                <img src="/assets/svg/home.svg" class="sidebar-menu__item-icon" />
-                Home
-              </a>
+            <img src="/assets/svg/home.svg" class="sidebar-menu__item-icon" />
+            Home
+            </a>
           </div>
           <div class="sidebar-menu__item2">
             <img src="/assets/svg/explore.svg" class="sidebar-menu__item-icon2" />
@@ -47,13 +47,14 @@
           <div class="profile-header">
             <div class="profile-cover"></div>
             <div class="profile-info">
-              <img src="{{ followerPhoto }}" alt="Profile Picture" class="profile-picture">
-              <h1 class="profile-name">{{ followerName }}</h1>
-              <h1 class="profile-name">{{ followerEmail }}</h1>
-              <p class="profile-bio">This is a sample bio</p>
+              <!-- user main details -->
+              <img src="{{ user.profilePic }}" alt="Profile Picture" class="profile-picture">
+              <h1 class="profile-name">{{ user.firstName }}, {{ user.lastName }}</h1>
+             <h1 class="profile-name">{{ user.username }}</h1>
+             <p class="profile-bio">{{ user.bio }}</p>
               <div class="follows">
                 <div class="followers">
-                  <div class="follows_count">300</div>
+                  <div class="follows_count">{{followingCount}}</div>
                   <div class="follows_label">Followers</div>
                 </div>
                 <div class="following">
@@ -62,12 +63,11 @@
                 </div>
               </div>
               <br>
-              <button class="follow__button" (click)="toggleFollow(+followerId)" [ngClass]="{ 'followed': isFollowed(+followerId) }">
-                {{ followButtons[+followerId].followed ? 'Unfollow' : 'Follow' }}
+              <button class="follow__button" (click)="toggleFollow(user)" [ngClass]="{ 'followed': isFollowed(user) }">
+                {{ user.followed ? 'Unfollow' : 'Follow' }}
               </button>
             </div>
           </div>
-        
 
           <!-- bottom section of page showing tweets -->
           <div class="profile-content">
@@ -81,98 +81,124 @@
               <hr>
             </section>
 
-           <!-- created tweets by user -->
-            <section *ngIf="activeLabel === 'tweets'">
-                  <div class="tweet">
-                    <img class="tweet__author-logo" src="{{ followerPhoto }}" />
-                    <div class="tweet__main">
-                      <div class="tweet__header">
-                        <div class="tweet__author-name">
-                          {{ followerName }}
+             <!-- Tweets Content -->
+             <section *ngIf="activeLabel === 'tweets'">
+              <div *ngIf="showTweets">
+                  <div *ngFor="let tweet of userTweets$">
+                    <div class="tweet">
+                       <img class="tweet__author-logo" src="{{ tweet.profilePic }}" />
+                      <div class="tweet__main">
+                        <div class="tweet__header">
+                          <div class="tweet__author-name">
+                            {{ tweet.firstName }}, {{ tweet.lastName }}
+                          </div>
+                          <div class="tweet__author-email">
+                            - {{ tweet.username }}
+                          </div>
+                          <div class="tweet__publish-time">
+                            ({{ tweet.createdDate | date:'dd/MM/yy HH:mm'}})
+                          </div>
                         </div>
-                        <div class="tweet__author-email">
-                          - {{ followerEmail }}
+                        <div class="tweet__content">
+                          {{ tweet.tweetText }}
                         </div>
-                        <div class="tweet__publish-time">
-                            7/1/23, 10:00 AM
-                        </div>
-                      </div>
-                      <div class="tweet__content">
-                        Hello, this is my very own tweet
-                      </div>
-                      <br>
-                      <div class="tweet__footer">
-                      </div>
-                    </div>
-                  </div>
-            </section>
-
-
-          <!-- liked tweets by user -->
-            <section *ngIf="activeLabel === 'likedTweets'">
-                  <div class="tweet">
-                    <img class="tweet__author-logo" src="/assets/images/profile-image-1.jpg" />
-                    <div class="tweet__main">
-                      <div class="tweet__header">
-                        <div class="tweet__author-name">
-                          Jessica
-                        </div>
-                        <div class="tweet__author-email">
-                          - jessica@gmail.com
-                        </div>
-                        <div class="tweet__publish-time">
-                            13/1/23, 12:30 AM
-                        </div>
-                      </div>
-                      <div class="tweet__content">
-                        Lorem ipsum tweet
-                      </div>
-                      <br>
-                      <div class="tweet__footer">
-                        <div class="likes-wrapper">
-                          <span class="material-icons liked">favorite_border</span>
-                          <span class="likes-count">2</span>
-                        </div>    
-                      </div>
-                    </div>
-                  </div>
-            </section>
-
-
-           <!-- retweets by user -->
-            <section  *ngIf="activeLabel === 'retweets'">
-                  <div class="tweet">
-                    <img class="tweet__author-logo" src="{{ followerPhoto }}" />
-                    <div class="tweet__main">
-                      <div class="tweet__header">
-                        <div class="tweet__author-name">
-                          {{ followerName }}
-                        </div>
-                        <div class="tweet__author-email">
-                          - {{ followerEmail }}
-                        </div>
-                        <div class="tweet__publish-time">
-                            14/1/23, 11:15 AM
-                        </div>
-                      </div>
-                      <div class="post__originalAuthor">
-                        <p class="retweet-info">Reposted Tweet - originally created by: Mary</p>
-                      </div>           
-                      <div class="tweet__content">
-                        hello, lorem ipsum this is another tweet
-                      </div>
-                      <br>
-                      <div class="tweet__footer">
-                        <div class="retweets-wrapper">
-                          <span class="material-icons clickable" >repeat</span>
-                          <span class="retweets-count">1</span>
+                        <br>
+                        <div class="tweet__footer">
                         </div>
                       </div>
                     </div>
                   </div>
-            </section>
+                <div *ngIf="userTweets$.length === 0">
+                  <p>No tweets available. <br> User has not created any tweet yet.</p>
+                </div>
+              </div>
+              </section>
   
-          </div>
+  
+              <!-- Liked Tweets Content -->
+              <section *ngIf="activeLabel === 'likedTweets'">
+              <div *ngIf="showLikedTweets">
+                  <div *ngFor="let tweet of userLikedTweets$">
+                    <div class="tweet">
+                      <img class="tweet__author-logo" src="{{ tweet.profilePic }}" />
+                      <div class="tweet__main">
+                        <div class="tweet__header">
+                          <div class="tweet__author-name">
+                            {{ tweet.firstName }}, {{ tweet.lastName }}
+                          </div>
+                          <div class="tweet__author-email">
+                            - {{ tweet.username }}
+                          </div>
+                          <div class="tweet__publish-time">
+                            ({{ tweet.createdDate | date:'dd/MM/yy HH:mm'}})
+                          </div>
+                        </div>
+                        <div *ngIf="tweet.retweetedBy" class="post__originalAuthor">
+                          <p class="retweet-info">Reposted Tweet - originally created by: {{ tweet.username }} </p>
+                        </div> 
+                        <div class="tweet__content">
+                          {{ tweet.tweetText }}
+                        </div>
+                        <br>
+                        <div class="tweet__footer">
+                          <div class="likes-wrapper">
+                            <span class="material-icons" [ngClass]="{ 'liked': tweet.isLiked }" >favorite_border</span>
+                            <span class="likes-count">{{ tweet.likeCounter }}</span>
+                          </div>    
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                <div *ngIf="userLikedTweets$.length === 0">
+                  <p>No tweets available. <br> User has not liked any tweet yet.</p>
+                </div>
+              </div>
+              </section>
+  
+  
+              <!-- Retweets Content -->
+              <section  *ngIf="activeLabel === 'retweets'">
+              <div *ngIf="showRetweets">
+              <div class="retweeted-tweets">
+                  <div *ngFor="let tweet of userRetweets$">
+                    <div class="tweet">
+                      <img class="tweet__author-logo" src="{{ tweet.profilePic }}" />
+                      <div class="tweet__main">
+                        <div class="tweet__header">
+                          <div class="tweet__author-name">
+                            {{ tweet.firstName }}, {{ tweet.lastName }}
+                          </div>
+                          <div class="tweet__author-email">
+                            - {{ tweet.username }}
+                          </div>
+                          <div class="tweet__publish-time">
+                            ({{ tweet.createdDate | date:'dd/MM/yy HH:mm'}})
+                          </div>
+                        </div>
+                          <div *ngIf="tweet.isRetweeted" class="post__originalAuthor">
+                            <p class="retweet-info">~ Reposted Tweet ~ </p>
+                          </div>         
+                        <div class="tweet__content">
+                          {{ tweet.tweetText }}
+                        </div>
+                        <br>
+                        <div class="tweet__footer">
+                          <div class="retweets-wrapper">
+                            <span class="material-icons clickable" >repeat</span>
+                            <span class="retweets-count">{{ tweet.retweetCounter + 1 }}</span>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                 <div *ngIf="userRetweets$.length === 0">
+                  <p>No retweeted tweets. <br> User has not retweeted any tweet yet.</p>
+                </div>
+              </div>
+              </div>
+              </section>
+  
+          </div> 
 
         </div>
       </div>
@@ -184,111 +210,16 @@
             <br>
 
             <div class="who-to-follow">
-                <div class="who-to-follow__block">
-                  <div class="who-to-follow__heading">
-                    Back to Profile
-                  </div>
-                </div>
-
                 <a routerLink="/profile" class="who-to-follow__block">
-                  <img
-                    class="who-to-follow__author-logo"
-                    src="{{loggedInPhoto}}"/>
-                  <div class="who-to-follow__content">
-                    <div>
-                      <div class="who-to-follow__author-name">
-                        {{loggedInName}}
-                      </div>
-                      <div class="who-to-follow__author-email">
-                        {{loggedInEmail}}
-                      </div>
+                  <div class="who-to-follow__block">
+                    <div class="who-to-follow__heading">
+                      Back to Profile
                     </div>
                   </div>
                 </a>
             </div>
-
-            <!-- who to follow section -->
             <br>
-            <div class="who-to-follow">
-                <div class="who-to-follow__block">
-                  <div class="who-to-follow__heading">
-                    Who to follow
-                  </div>
-                </div>
-    
-                <div class="who-to-follow__block">
-                  <img
-                    class="who-to-follow__author-logo"
-                    src="/assets/images/profile-image-1.jpg"/>
-                  <div class="who-to-follow__content">
-                    <div [routerLink]="['/follower-profile', { id: '0', name: 'David', email: 'david@gmail.com', photo: '/assets/images/profile-image-1.jpg' }]">
-                      <div class="who-to-follow__author-name">
-                        David
-                      </div>
-                      <div class="who-to-follow__author-email">
-                        david@gmail.com
-                      </div>
-                    </div>
-                    <button class="who-to-follow__button" (click)="toggleFollow(0)" [ngClass]="{ 'followed': isFollowed(0) }">
-                      {{ followButtons[0].followed ? 'Unfollow' : 'Follow' }}
-                    </button>
-                  </div>
-                </div>
-                <div class="who-to-follow__block">
-                  <img
-                    class="who-to-follow__author-logo"
-                    src="/assets/images/profile-image-2.png"/>
-                  <div class="who-to-follow__content">
-                    <div [routerLink]="['/follower-profile', { id: '1', name: 'Susan', email: 'susan@gmail.com', photo: '/assets/images/profile-image-2.png' }]">
-                      <div class="who-to-follow__author-name">
-                        Susan
-                      </div>
-                      <div class="who-to-follow__author-email">
-                        susan@gmail.com
-                      </div>
-                    </div>
-                    <button class="who-to-follow__button" (click)="toggleFollow(1)" [ngClass]="{ 'followed': isFollowed(1) }">
-                      {{ followButtons[1].followed ? 'Unfollow' : 'Follow' }}
-                    </button>
-                  </div>
-                </div>
-                <div class="who-to-follow__block">
-                  <img
-                    class="who-to-follow__author-logo"
-                    src="/assets/images/profile-image-3.jpg"/>
-                  <div class="who-to-follow__content">
-                    <div [routerLink]="['/follower-profile', { id: '2', name: 'John', email: 'john@gmail.com', photo: '/assets/images/profile-image-3.jpg' }]">
-                      <div class="who-to-follow__author-name">
-                        John
-                      </div>
-                      <div class="who-to-follow__author-email">
-                        john@gmail.com
-                      </div>
-                    </div>
-                    <button class="who-to-follow__button" (click)="toggleFollow(2)" [ngClass]="{ 'followed': isFollowed(2) }">
-                      {{ followButtons[2].followed ? 'Unfollow' : 'Follow' }}
-                    </button>
-                  </div>
-                </div>
-                <div class="who-to-follow__block">
-                  <img
-                    class="who-to-follow__author-logo"
-                    src="/assets/images/profile-image-2.png"/>
-                  <div class="who-to-follow__content">
-                    <div [routerLink]="['/follower-profile', { id: '3', name: 'Teresa', email: 'teresa@gmail.com', photo: '/assets/images/profile-image-2.png' }]">
-                      <div class="who-to-follow__author-name">
-                        Teresa
-                      </div>
-                      <div class="who-to-follow__author-email">
-                        teresa@gmail.com
-                      </div>
-                    </div>
-                    <button class="who-to-follow__button" (click)="toggleFollow(3)" [ngClass]="{ 'followed': isFollowed(3) }">
-                      {{ followButtons[3].followed ? 'Unfollow' : 'Follow' }}
-                    </button>
-                  </div>
-                </div>
-            </div>
+           
         </div>
       </div>
     </div>

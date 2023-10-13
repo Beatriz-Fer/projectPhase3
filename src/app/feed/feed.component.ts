@@ -1,156 +1,139 @@
-import { Component, OnInit, OnDestroy } from '@angular/core';
-import { Tweet } from '../tweet';
+import { Component, OnInit } from '@angular/core';
+import { FormGroup, Validators, FormControl, AbstractControl } from '@angular/forms';
 import { TweetService } from '../tweet.service';
 import { Router } from '@angular/router';
+import { HttpClient } from '@angular/common/http'
+import { TweetModel } from '../TweetModel';
+import { User } from '../UserModel';
+import { AuthService } from '../auth/shared/auth.service';
+import { CreateTweetPayload } from '../payloads/create-tweet.payload';
+
 
 @Component({
   selector: 'app-feed',
   templateUrl: './feed.component.html',
   styleUrls: ['./feed.component.css']
 })
-export class FeedComponent implements OnInit, OnDestroy {
+export class FeedComponent implements OnInit {
 
-  tweets: Tweet[] = [];
-
-  loggedInName!: string; 
-  loggedInEmail!: string; 
-  loggedInBio: string = '';
-  loggedInPhoto: string = '';
-
-  newTweetContent: string = '';
+  user!: User;
+  id!: number;
 
   activeTweet: any = null;
-  currentDateTimestamp: Date = new Date();
-
   searchQuery: string = '';
 
-  constructor(private tweetService: TweetService, private router: Router) {  
-    this.currentDateTimestamp = new Date();
-  }
+  tweets$: Array<TweetModel>;
 
+  isLoggedIn!: boolean;
+  username!: string;
 
-  ngOnInit() {
-    // Retrieve the logged-in user from local storage
-    this.loggedInName = localStorage.getItem('loggedInName') || '';
-    this.loggedInEmail = localStorage.getItem('loggedInEmail') || ''; 
-    this.loggedInBio = localStorage.getItem('loggedInBio') || '';
-    this.loggedInPhoto = localStorage.getItem('loggedInPhoto') || '';
+  createTweetForm!: FormGroup;
+  createTweetPayload: CreateTweetPayload;
 
-    this.getTweets();
+  imageSurce: any;
+  errorMessage: string | null = null;
 
-    // Retrieve the tweets from local storage when the component is initialized
-    this.retrieveTweetsFromLocalStorage();
-    
-     // Retrieve the comments from local storage 
-    this.retrieveCommentsFromLocalStorage();   
+  currentPage!: number ;
+  itemsPerPage!: number ;
+  totalPages: number = 0; 
 
-  }
+  constructor(private tweetService: TweetService, private router: Router, private http: HttpClient, private authService: AuthService) {  
 
-
-  ngOnDestroy() {
-    // Save the comments to local storage when the component is destroyed (user leaves the page)
-    this.saveCommentsToLocalStorage();
-
-     // Save the tweets to local storage
-    this.saveTweetsToLocalStorage();
-
-    window.location.reload();
-
-  }
-
-
-  retrieveTweetsFromLocalStorage() {
-    const savedTweets = localStorage.getItem('tweets');
-    if (savedTweets) {
-      const parsedTweets = JSON.parse(savedTweets);
-      this.tweets = parsedTweets.map((tweet: Tweet) => {
-        // Check if the logged-in user has changed their name/ profile pic
-        if (tweet.email === this.loggedInEmail) {
-          tweet.author = this.loggedInName;
-          tweet.profilePic = this.loggedInPhoto;
-        }
-        return tweet;
-      });
-    }
-  }
-
-
-  retrieveCommentsFromLocalStorage() {
-    const savedComments = localStorage.getItem('comments');
-    if (savedComments) {
-      const parsedComments = JSON.parse(savedComments);
-      this.tweets.forEach((tweet, index) => {
-        tweet.comments = parsedComments[index] || []; // empty array if comments are undefined
-        tweet.commentCount = (tweet.comments?.length || 0) + 2; // updates comment count
-      });
-    }
-  }
-
-
- logout() {
-    // Clears the comments, likes and retweets
-    this.tweets.forEach((tweet) => {
-      tweet.comments = [];
-      tweet.commentCount = 0;
-      tweet.retweets = 0;
-      tweet.isLiked = false;
-      tweet.likes--;
+    this.createTweetForm = new FormGroup({
+      tweetText: new FormControl('', [Validators.required, tweetTextValidator])
     });
 
-    this.getTweets();
+    this.tweets$ = new Array();
 
-    // Save the updated comments to local storage
-    this.saveCommentsToLocalStorage();
+    this.createTweetPayload = {
+      tweetType: '',
+      text: ''
+    }
 
-    // Clear the local storage
-    localStorage.clear();
-
-    // Refresh page to mimic closing the application
-    window.location.href = '/';
-
-    this.router.navigate(['/register']);
-  }
-  
-
-
-  private getTweets() {
-    // getting the retweets, likes and dummy tweets
-    const tweets = this.tweetService.getTweets();
-    const retweets = this.tweetService.getRetweets();
-    const likes = this.tweetService.getLikes();
-  
-    const likedTweetContents = likes.map(tweet => tweet.content);
-     
-    // Combine the user and followed tweets
-    this.tweets = [
-      ...tweets.filter(tweet => !likedTweetContents.includes(tweet.content)),
-      ...retweets,
-      ...likes
-    ];
-  
-    // Sort the tweet order
-    this.tweets.sort((a, b) => b.timestamp.getTime() - a.timestamp.getTime());
+    this.id = this.authService.getUserId();
   }
 
 
-  // save tweets to local storage
-  private saveTweetsToLocalStorage() {
-    localStorage.setItem('tweets', JSON.stringify(this.tweets));
-   
+  ngOnInit(): void {
+    this.authService.loggedIn.subscribe((data: boolean) => this.isLoggedIn = data);
+    this.authService.username.subscribe((data: string) => this.username = data);
+    this.username = this.authService.getUserName();
+
+    this.currentPage = 1;
+    this.itemsPerPage = 5; // total number of tweets displayed in feed page
+    this.getTweets(this.currentPage, this.itemsPerPage);
+
+    this.http.get<User>('http://localhost:8080/api/user/' + this.id).subscribe(
+      (userData) => {
+        this.user = userData;
+      },
+      (error) => {
+        console.error('Error fetching user data', error);
+      }
+    )
+
   }
 
 
+  // logging out - user is brought to login page
+  logout() {
+  this.authService.logout();
+  this.isLoggedIn = false;
+  this.router.navigate(['/login']);
+  }
+
+
+  // tweets appear in feed page in pages of 5 tweets each
+  private getTweets(page: number, pageSize: number) {
+    const self = this;
+    this.tweetService.getPaginatedFeed(page, pageSize).subscribe({
+      next(data) {
+        if (data && Array.isArray(data)) {
+          self.tweets$ = data;
+          self.totalPages = (data.length);
+        } else {
+          // Case where data is not in expected format
+          console.error('Invalid data format:', data);
+        }
+      },
+      error(err) {
+        // Handling errors if necessary
+        console.error('Error fetching tweets:', err);
+      }
+    });
+  }
+
+
+  // next page of the feed
+  nextPage() {
+    if (this.currentPage <= this.totalPages) {
+      this.currentPage++;
+      this.getTweets(this.currentPage, this.itemsPerPage);
+    }
+  }
+  
+
+  // previous page of the feed
+  previousPage() {
+    if (this.currentPage > 1) {
+      this.currentPage--;
+      this.getTweets(this.currentPage, this.itemsPerPage);
+    }
+  }
+
+
+  //search tweets in the feed page
   searchTweets() {
     // Perform the search based on the searchQuery
-    const filteredTweets = this.tweets.filter((tweet) => {
+    const filteredTweets = this.tweets$.filter((tweet) => {
       const lowerCaseQuery = this.searchQuery.toLowerCase();
-      const lowerCaseContent = tweet.content.toLowerCase();
-      const lowerCaseAuthor = tweet.author.toLowerCase();
+      const lowerCaseContent = tweet.tweetText.toLowerCase();
+      const lowerCaseAuthor = tweet.username.toLowerCase();
       return lowerCaseContent.includes(lowerCaseQuery) || lowerCaseAuthor.includes(lowerCaseQuery);
     });
 
     // Update the tweets with the filtered results
-    this.tweets = filteredTweets;
+    this.tweets$ = filteredTweets;
 
     // Reset the search if search query is empty
     if (this.searchQuery === '') {
@@ -161,125 +144,126 @@ export class FeedComponent implements OnInit, OnDestroy {
   // reset the search
   resetSearch() {
     this.searchQuery = '';
-    this.getTweets();
+    this.getTweets(this.currentPage, this.itemsPerPage);
   }
-  
+
+
+  // create a new tweet for feed page
   createTweet() {
-    // Check if the tweet content is not empty and within the character limit
-    if (this.newTweetContent && this.newTweetContent.length <= 280) {
-      const tweet: Tweet = {
-        profilePic: this.loggedInPhoto,
-        author: this.loggedInName,
-        email: this.loggedInEmail,
-        content: this.newTweetContent,
-        timestamp: new Date(),
-        likes: 0,
-        comments: [],
-        retweets: 0, 
-        commentText: '',
-        commentCount: 2
-      };
-  
-      // Add the new tweet to the beginning of the tweets array
-      this.tweets.unshift(tweet);
-  
-      // Add the new tweet to the tweet service
-      this.tweetService.addTweet(tweet);
 
-      // Clear the tweet input field
-      this.newTweetContent = '';
+  this.createTweetPayload.tweetType = 'TWEET_TYPE';
+  this.createTweetPayload.text = this.createTweetForm.get('tweetText')!.value;
 
-      // Save the tweets to local storage after adding a new tweet
-      this.saveTweetsToLocalStorage();
-      this.tweets.sort((a, b) => b.timestamp.getTime() - a.timestamp.getTime());
+  const self = this;
+  this.tweetService.createTweet(this.createTweetPayload).subscribe({
+    next(response) {
+      console.log(response)
+      self.createTweetForm.reset();
+      self.router.navigateByUrl("/feed");
+    },
+    complete() { window.location.reload(); },
+    error(error) {
+      if (error.status === 400){
+        // making sure the same tweet is not being created again
+        self.errorMessage = "You have already tweeted this text."
+      } else {
+          console.log(error);
+      }
     }
+  })
+
   }
 
 
   // when the liked button is clicked
-  toggleLike(tweet: Tweet) {
-
-    if (tweet.isLiked) {
-      this.tweetService.removeLike(tweet); 
-    } else {
-      this.tweetService.addLike(tweet);
-    }
-    tweet.isLiked = !tweet.isLiked;
-
-    // Save the liked tweets to local storage after 
-    this.saveTweetsToLocalStorage();
-    this.tweets.sort((a, b) => b.timestamp.getTime() - a.timestamp.getTime());
+  toggleLike(tweet: TweetModel) {
+    this.tweetService.like(tweet.id).subscribe({
+      next(response) {
+        console.log(response)
+        if (tweet.retweetedBy){
+          tweet.retweetedBy.isLiked = !tweet.retweetedBy.isLiked;
+          tweet.retweetedBy.likeCounter += tweet.retweetedBy.isLiked ? 1 : -1;
+        } else{
+           tweet.isLiked = !tweet.isLiked;
+           tweet.likeCounter += tweet.isLiked ? 1 : -1;
+        } 
+      },
+      complete() { },
+      error(error) {
+        console.log(error)
+      }
+    }) 
   }
 
 
   // comment pop up box
   toggleTextBox(tweet: any) {
-    if (this.activeTweet === tweet) {
-      this.activeTweet = null;
-    } else {
-      this.activeTweet = tweet;
+      if (this.activeTweet === tweet) {
+        this.activeTweet = null;
+      } else {
+        this.activeTweet = tweet;
+      }
     }
-   }
 
   closePopup() {
     this.activeTweet = null;
   }
 
-
-  // writing a comment
-  submitText(tweet: Tweet) {
-
-    if (this.activeTweet.commentText) {
-      if (!tweet.comments) {
-        tweet.comments = [];
-      }
-      tweet.comments.push(this.activeTweet.commentText);
-      this.activeTweet.commentText = '';
-  
-      const tweetIndex = this.tweets.findIndex(t => t === tweet);
-      if (tweetIndex !== -1) {
-        this.tweets[tweetIndex].commentCount += 1;
-        this.tweets[tweetIndex].isCommented = true;
-        this.tweets[tweetIndex].commentDate = this.currentDateTimestamp;
-      }
-  
-      // Store the updated comments in local storage
-      this.saveCommentsToLocalStorage();
-    }
-  }
-  private saveCommentsToLocalStorage() {
-    localStorage.setItem('comments', JSON.stringify(this.tweets.map(tweet => tweet.comments)));
-  }
-
-
-  retweet(tweet: Tweet) {
-    // Create a new tweet object based on the original tweet
-    const retweetedTweet: Tweet = {
-      profilePic: this.loggedInPhoto,
-      author: this.loggedInName,
-      email: this.loggedInEmail,
-      content: tweet.content,
-      timestamp: new Date(),
-      likes: 0,
-      comments: [],
-      originalAuthor: tweet.author, // Add the original author to the retweeted tweet
-      originalDate: tweet.timestamp,
-      retweets: 0, 
-      commentCount: 2
-    };
     
-    this.tweets.unshift(retweetedTweet);
 
-    tweet.retweets ++;
+  //submitting a comment for specific tweet
+  submitText(tweet: TweetModel) {
+    const inputtedComment = this.activeTweet.commentText;
 
-    // Add the new tweet to the tweet service
-    this.tweetService.addRetweet(retweetedTweet);
+    this.http.post(`http://localhost:8080/api/tweet/${tweet.id}/comment`, inputtedComment).subscribe(
+      (response) => {
+        const updatedTweet: TweetModel = response as TweetModel;
+        tweet.comments = updatedTweet.comments; // Update the comments array in the original tweet
+        // Clear the comment text field
+        this.activeTweet.commentText = '';
+        this.refreshComments(tweet);
+      },
+      (error) => {
+        console.error('Error saving comment:', error);
+      }
+    );
+    window.location.reload();
+  }
+    
 
-    // Save the tweets to local storage after adding a new tweet
-    this.saveTweetsToLocalStorage();
-    this.tweets.sort((a, b) => b.timestamp.getTime() - a.timestamp.getTime());
+  // refreshing the comments and retrieving them
+  refreshComments(tweet: TweetModel){
+    this.tweetService.commentList(tweet.id).subscribe(
+      (commentList) => {
+        tweet.comments = commentList;
+      },
+      (error) => {
+        console.error('Error retrieving comments', error);
+      }
+    )
   }
 
- 
+
+  // creating a retweet/ repost of a normal tweet
+  retweet(tweet: TweetModel) {
+   this.tweetService.retweet(tweet.id).subscribe({
+      next(response) {
+        console.log(response)
+        tweet.isRetweeted = true;
+      },
+      complete() { },
+      error(error) {
+        console.log(error)
+      }
+    }) 
+    window.location.reload();
+  }
+
 }
-  
+
+// Validation function for tweet creation max length 100 
+function tweetTextValidator(control: AbstractControl): { [key: string]: boolean } | null {
+  const value = control.value;
+  const maxLength = 100;
+  return value.length <= maxLength ? null : { characterLimitExceeded: true};
+}

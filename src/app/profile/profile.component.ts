@@ -1,6 +1,12 @@
 import { Component, OnInit, OnDestroy } from '@angular/core';
-import { Tweet } from '../tweet';
-import { TweetService } from '../tweet.service';
+import { FormGroup, FormControl } from '@angular/forms';
+import { User } from '../UserModel';
+import { AuthService } from '../auth/shared/auth.service';
+import { UserService } from '../user.service';
+import { HttpClient } from '@angular/common/http';
+import { TweetModel } from '../TweetModel';
+import { ToastrService } from 'ngx-toastr';
+import { LocalStorageService } from 'ngx-webstorage';
 
 
 @Component({
@@ -10,83 +16,98 @@ import { TweetService } from '../tweet.service';
 })
 export class ProfileComponent implements OnInit, OnDestroy{
 
+  user!: User;
+  id!: number;
 
-  userTweets: Tweet[] = [];
-  likedTweets: Tweet[] = []; 
-  retweetedTweets: Tweet[] = [];
+  userTweets$: Array<TweetModel>;
+  userRetweets$: Array<TweetModel>;
+  userLikedTweets$: Array<TweetModel>;
 
-  loggedInEmail: string = '';
-  loggedInName: string = '';
-  loggedInBio: string = '';
-  loggedInPhoto: string | null = null;
+  allUsers$: Array<User>;
+
+  updateForm!: FormGroup;
+
+  selectedFile: File | null = null;
 
   showUserTweets: boolean = true;
   showUserLikedTweets: boolean = false;
   showUserRetweets: boolean = false;
 
-  
+  photoString: string;
   activeLabel: string = 'tweets';
-
   followingCount = 500;
-
   showPopup: boolean = false;
 
-  followButtons = [
-    { label: 'Follow 1', followed: false },
-    { label: 'Follow 2', followed: false },
-    { label: 'Follow 3', followed: false },
-    { label: 'Follow 4', followed: false }
-  ];
+  constructor(private userService: UserService, private authService: AuthService, 
+    private http: HttpClient, private toastr: ToastrService, 
+    private localStorage: LocalStorageService){
 
-  constructor(private tweetService: TweetService){
-    
+    this.userTweets$ = new Array();
+    this.userRetweets$ = new Array();
+    this.userLikedTweets$ = new Array();
+
+    this.allUsers$ = new Array();
+
+    this.id = this.authService.getUserId();
+    this.photoString = ""; 
   }
   
-
   ngOnInit() { 
+    // get user infromation
+    this.http.get<User>('http://localhost:8080/api/user/' + this.id).subscribe(
+      (userData) => {
+        this.user = userData;
+        this.localStorage.store('userPhoto', userData.profilePic);
+      },
+      (error) => {
+        console.error('Error fetching user data', error);
+      }
+    )
 
-  // Retrieve the logged-in information and tweets
-  this.loggedInEmail = localStorage.getItem('loggedInEmail') || '';
-  this.loggedInName = localStorage.getItem('loggedInName') || '';
-  this.loggedInBio = localStorage.getItem('loggedInBio') || '';
-  this.loggedInPhoto = localStorage.getItem('loggedInPhoto') || '';
-
-  const savedUserTweets = localStorage.getItem('tweets') || '';
-
-  // Following button state and count
-  const storedFollowedState = localStorage.getItem('followedState');
-  const storedFollowingCount = localStorage.getItem('followingCount');
-
-  if (storedFollowedState) {
-    this.followButtons = JSON.parse(storedFollowedState);
-  }
-
-  if (storedFollowingCount) {
-    this.followingCount = Number(storedFollowingCount);
-  }
-  
-
-  //getting the users tweets, liked tweets and retweets based on actions took in feed page
-  if (savedUserTweets) {
-    this.userTweets = JSON.parse(savedUserTweets)
-  .filter((tweet: { email: string, originalAuthor?: string }) => {
-    return tweet.email === this.loggedInEmail && !tweet.originalAuthor;
-  });
-    
-    this.likedTweets = JSON.parse(savedUserTweets).filter((tweet: { isLiked: boolean; }) => tweet.isLiked === true);
-
-    this.retweetedTweets = JSON.parse(savedUserTweets)
-    .filter((tweet: { email: string, originalAuthor?: string }) => {
-      return tweet.email === this.loggedInEmail && tweet.originalAuthor;
+    // get specified user tweets
+    this.userService.getUserTweets(this.id).subscribe((tweets) => {
+      this.userTweets$ = tweets;
     });
-  }
+
+    // get specified user retweets
+    this.userService.getUserRetweets(this.id).subscribe((tweets) => {
+      this.userRetweets$ = tweets;
+    });
+
+    // get specified user liked tweets
+    this.userService.getUserLikedTweets(this.id).subscribe((tweets) => {
+      this.userLikedTweets$ = tweets;
+    });
+
+    // get all other users apart from logged in one - to show on who to follow list
+    this.userService.getAllUsers().subscribe((userList) => {
+      this.allUsers$ = userList.filter(selectedUser => selectedUser.username !== this.user.username);
+    });
+
+    this.updateForm = new FormGroup({
+      firstName: new FormControl(''),
+      lastName: new FormControl(''),
+      bio: new FormControl('')
+    });
+
+
+    // Following
+    const storedFollowedState = localStorage.getItem('followedState');
+    const storedFollowingCount = localStorage.getItem('followingCount');
+    if (storedFollowedState) {
+      this.user.followed = JSON.parse(storedFollowedState);
+    }
+    if (storedFollowingCount) {
+      this.followingCount = Number(storedFollowingCount);
+    }
 }
 
 
 ngOnDestroy(): void {
   // Save followed state and following count to browser storage
-  localStorage.setItem('followedState', JSON.stringify(this.followButtons));
+  localStorage.setItem('followedState', JSON.stringify(this.user.followed));
   localStorage.setItem('followingCount', this.followingCount.toString());
+  window.location.reload();
 }
 
 
@@ -95,51 +116,54 @@ openPopup() {
   this.showPopup = true;
 }
 
-
 // select a profile image from files
 onFileSelected(event: any) {
   const file: File = event.target.files[0];
-
   if (file) {
     const reader = new FileReader();
     reader.onload = (e: any) => {
-      this.loggedInPhoto = e.target.result;
+      this.user.profilePic = e.target.result;
     };
     reader.readAsDataURL(file);
   }
 }
-
 
 closePopup() {
   this.showPopup = false;
 }
 
 
+//save new editted changes to user profile
 saveChanges() {
 
-  // Convert the loggedInPhoto to a string before storing it in localStorage
-  const photoString = this.loggedInPhoto ? this.loggedInPhoto.toString() : '';
-  localStorage.setItem('loggedInPhoto', photoString);
+  this.user.firstName = this.updateForm?.get('firstName')?.value;
+  this.user.lastName = this.updateForm?.get('lastName')?.value;
+  this.user.bio = this.updateForm?.get('bio')?.value;
+  window.location.reload();
 
-  // Perform the logic to save the changes
-  localStorage.setItem('loggedInName', this.loggedInName);
-  localStorage.setItem('loggedInBio', this.loggedInBio);
-
-  // Close the popup box
+  const self = this;
+    this.userService.updateUser(this.id, this.user).subscribe(
+      (reponse) => {
+        console.log('Profile updated successfully', reponse);
+        self.toastr.success('Login Successful');
+      },
+      (error) => {
+        self.toastr.error("Unable to apply changes");
+        console.error('Error updating profile', error);
+      }
+    );
   this.showPopup = false;
 }
 
 
 // follow button to increment or decrement following number
-toggleFollow(index: number): void {
-  const button = this.followButtons[index];
-  button.followed = !button.followed;
-  this.followingCount += button.followed ? 1 : -1;
+  toggleFollow(user: User): void {
+  user.followed = !user.followed;
+  this.followingCount += user.followed ? 1: -1;
 }
 
-
-isFollowed(buttonIndex: number): boolean {
-  return this.followButtons[buttonIndex].followed;
+isFollowed(user: User): boolean {
+  return user.followed;
 }
 
 
@@ -152,7 +176,7 @@ changeContent(label: string) {
 showTweets() {
   this.showUserTweets = true;
   this.showUserLikedTweets = false;
-  this.showUserRetweets = false;
+  this.showUserRetweets = false;    
 }
 
 showLikedTweets() {

@@ -11,7 +11,7 @@ const routes: Routes = [
   { path: 'login', component: LoginComponent },
   { path: 'feed', component: FeedComponent},
   { path: 'profile', component: ProfileComponent },
-  { path: 'follower-profile/:id/:name/:email/:photo', component: FollowerProfileComponent }
+  { path: 'follower-profile/:id', component: FollowerProfileComponent }
 ];
 
 @NgModule({

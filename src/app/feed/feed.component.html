@@ -8,9 +8,8 @@
     <div class="layout">
       <div class="layout__left-sidebar">
         <div class="sidebar-menu">
-
+          <!-- This is the left side pane menu -->
           <img src="/assets/svg/twitter.svg" class="logo" />
-
           <div class="sidebar-menu__item sidebar-menu__item--active">
             <img src="/assets/svg/home.svg" class="sidebar-menu__item-icon" />
             Home
@@ -41,61 +40,69 @@
         <div class="sticky">
           <div class="top_feed">
             <div class="top_feed__header">
-              <h2>Welcome, {{ loggedInName }}!</h2>
+              <h2>Welcome, {{ username }}</h2>
             </div>
             <!-- tweetbox starts -->
             <div class="tweetBox" >
-              <form (ngSubmit)="createTweet()">
-                <div class="tweetbox__input">
-                  <img src="{{ loggedInPhoto }}" alt="" />
-                  <input type="text" name="tweet" placeholder="What's happening?" [(ngModel)]="newTweetContent" />
+              <form id="createTweetForm" [formGroup]="createTweetForm" (ngSubmit)="createTweet()">
+                <div class="tweetbox__input"> 
+                  <img *ngIf="user && user.profilePic" src="{{ user.profilePic }}" alt="profilePic" />
+                  <input type="text" name="tweet" placeholder="What's happening?" [formControlName]="'tweetText'"/>
                 </div>
-                <button class="tweetBox__tweetButton clickable" (click)="createTweet()">Tweet</button>
-              </form>
+                <button class="tweetBox__tweetButton clickable" [disabled]="createTweetForm.invalid">Tweet</button>
+                <div *ngIf="createTweetForm?.get('tweetText')?.hasError('characterLimitExceeded')" class="error">
+                  <b>Tweet must contain less than 100 characters.</b>
+                </div>
+                <div *ngIf="errorMessage" class="error">
+                  <b>{{ errorMessage }}</b>
+                </div>
+               </form>
             </div>
             <!-- tweetbox ends -->
           </div>
-        </div>
+        </div> 
 
-
+      
         <!-- Feed -->
-        <div *ngIf="tweets.length > 0" >
-          <div *ngFor="let tweet of tweets">
+        <div *ngIf="tweets$.length > 0" > 
+          <div *ngFor="let tweet of tweets$">
             <div class="tweet" >
-
-              <img class="tweet__author-logo"src="{{ tweet.profilePic }}" />
-
-              <div class="tweet__main">
+               <img class="tweet__author-logo" [src]="tweet.retweetedBy ? tweet.retweetedBy.profilePic : tweet.profilePic" />
+               <div class="tweet__main">
                 <div class="tweet__header">
-                  <div class="tweet__author-name">
-                    {{ tweet.author }}
+                   <div class="tweet__author-name">
+                    {{ tweet.retweetedBy ? 
+                      tweet.retweetedBy.firstName + ' ' + tweet.retweetedBy.lastName
+                      : tweet.firstName + ' ' + tweet.lastName }}
                   </div>
                   <div class="tweet__author-email">
-                    - {{ tweet.email }}
+                    - {{ tweet.retweetedBy ? tweet.retweetedBy.username : tweet.username }}
                   </div>
                   <div class="tweet__publish-time">
-                    {{ tweet.timestamp | date : 'short' }}
+                     {{ (tweet.retweetedBy ? tweet.retweetedBy.createdDate : tweet.createdDate) | date:'dd/MM/yy HH:mm' }}
                   </div>
                 </div>
-                <div *ngIf="tweet.originalAuthor" class="post__originalAuthor">
-                  <p class="retweet-info">Reposted Tweet - originally created by: {{ tweet.originalAuthor }} ({{ tweet.originalDate | date : 'short' }})</p>
+                  <div *ngIf="tweet.retweetedBy && tweet.retweetedBy.username" class="post__originalAuthor">
+                  <p class="retweet-info">~ Reposted Tweet ~ originally created by: {{ tweet.username }}</p>
                 </div>           
-                <div class="tweet__content" [innerHTML]="tweet.content">
-                  {{ tweet.content }}
+                <div class="tweet__content">
+                  {{ tweet.tweetText }}
                 </div>
                 <br>
                 <div class="tweet__footer">
                   <div class="retweets-wrapper">
-                    <span class="material-icons clickable" (click)="retweet(tweet)">repeat</span>
-                    <span class="retweets-count" *ngIf="tweet.retweets > 0">{{ tweet.retweets }}</span>
-                  </div>
+                     <span class="material-icons clickable" (click)="retweet(tweet)">repeat</span>
+                    <span class="retweets-count">
+                      {{ tweet.retweetCounter }}
+                    </span>
+                 </div>
                   <div class="likes-wrapper">
-                    <span class="material-icons" [ngClass]="{ 'liked': tweet.isLiked }" (click)="toggleLike(tweet)">favorite_border</span>
-                    <span class="likes-count" *ngIf="tweet.likes > 0">{{ tweet.likes }}</span>
+                     <span class="material-icons" [ngClass]="{ 'liked': tweet.isLiked || (tweet.retweetedBy && tweet.retweetedBy.isLiked) }" (click)="toggleLike(tweet)">favorite_border</span>
+                     <span class="likes-count"> {{ tweet.retweetedBy ? tweet.retweetedBy.likeCounter : tweet.likeCounter }}</span>
                   </div>
                   <div class="comment-wrapper">
-                   <span class="material-icons clickable" [ngClass]="{ 'commented': tweet.isCommented }" (click)="toggleTextBox(tweet)">comment</span>
-                   <span class="comments-count" *ngIf="tweet.commentCount > 0">{{ tweet.commentCount }}</span>
+                    <span class="material-icons clickable" (click)="toggleTextBox(tweet)">comment</span>
+                    <span class="comments-count">{{ tweet.commentCounter }}</span>
                   </div>
                 </div>
               </div>
@@ -109,28 +116,20 @@
                     <button (click)="closePopup()" class="exit-button">&times;</button>
                   </div>
                   <div class="popup-content">
-                    <input type="text" [(ngModel)]="tweet.commentText" class="comment-input-text" placeholder="Write your comment...">
-                    <button (click)="submitText(tweet)" class="comment-submit-button">Submit</button>
+                    <input type="text" [(ngModel)]="activeTweet.commentText" class="comment-input-text" placeholder="Write your comment...">
+                    <button (click)="submitText(tweet); refreshComments(tweet)" class="comment-submit-button">Submit</button>
                   </div>
                   <div class="comment_section">
                     <p class="comment_section_p">Comments:</p>
-                    <div *ngIf="tweet.comments && tweet.comments.length > 0" >
+                      <div *ngIf="tweet.comments">
                       <ul>
-                        <li *ngFor="let text of tweet.comments">
+                          <li *ngFor="let comment of tweet.comments">
                           <div class="comment">
-                            <p class="comment-text">{{ text }}</p>
-                            <p class="comment-author">- {{ loggedInEmail }} {{ currentDateTimestamp | date : 'short' }} </p>
+                            <p class="comment-text">{{ comment.text }}</p>
+                            <p class="comment-author">- {{ comment.username }} ({{ comment.createdDate | date:'dd/MM/yy HH:mm'}})</p>
                           </div>
                         </li>
                       </ul>
-                    </div>
-                    <div class="comment">
-                      <p class="comment-text">Adipiscing at in tellus integer feugiat scelerisque. Velit aliquet sagittis id consectetur purus ut.</p>
-                      <p class="comment-author">- david@gmail.com 7/6/23, 11:45 AM </p>
-                    </div>
-                    <div class="comment">
-                      <p class="comment-text">Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.</p>
-                      <p class="comment-author">- susan@gmail.com 7/6/23, 10:15 AM </p>
                     </div>
                   </div>
                 </div>    
@@ -140,15 +139,17 @@
           </div>
         </div>
 
+        <div *ngIf="!tweets$ || tweets$.length ===0">
+          No tweets found
+        </div> 
+
       </div>
-      
 
       <!-- Right sidebar -->
       <div class="layout__right-sidebar-container">
         <div class="layout__right-sidebar">
           <button class="logOutButton clickable" (click)="logout()">Logout</button>
           <br><br>
-
           <!-- search block -->
           <div class="search__block">
           <div class="widgets">
@@ -158,7 +159,13 @@
             </div>
           </div>
           </div>
-
+          <!-- next / previous page -->
+          <div class="pagination">
+            <button class="pagesButtons clickable" (click)="previousPage()">Previous</button>
+            <div class="navHeading">Page: {{ currentPage }}</div>
+            <button class="pagesButtons clickable" (click)="nextPage()">Next</button>
+          </div>
+          <br>
           <!-- trends for you section -->
           <div class="trends-for-you">
             <div class="trends-for-you__block">

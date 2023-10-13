@@ -492,3 +492,30 @@ html {
     margin-top: 20px;
     margin-left: 220px;
   }
+
+  /* //////////////////////////////////////////////////////////////////////////////// */
+
+  /* // Next and Previous Page buttons // */
+
+  .pagesButtons {
+    background-color: #1da1f2;
+    border: none;
+    color: white;
+    font-weight: 7400;
+    border-radius: 30px;
+    width: 90px;
+    height: 30px;
+    margin-left: 25px;
+  }
+
+  .navHeading {
+    font-size: 15px;
+    font-weight: bold;
+    color: #14171a;
+  }
+
+  .pagination {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+  }
